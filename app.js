@@ -674,6 +674,10 @@ async function loadQuizQuestion(similarTo) {
     renderQuizQuestion(data);
   } catch (error) {
     quizAlternativesEl.innerHTML = `<p class="quiz-loading">${escapeHtml(error.message || 'Erro ao gerar questão.')}</p>`;
+    quizActions.hidden = false;
+    quizSimilarButton.hidden = true;
+    quizNextButton.hidden = true;
+    quizFinishButton.hidden = false;
   } finally {
     quizStartButton.disabled = false;
   }
