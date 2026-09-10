@@ -518,7 +518,9 @@ function updateQuizSubjectPills() {
 quizSubjectPillsContainer.addEventListener('click', (event) => {
   const pill = event.target.closest('.subject-pill');
   if (!pill) return;
+  if (pill.dataset.subject === quizSelectedSubject) return;
   quizSelectedSubject = pill.dataset.subject;
+  quizTopicInput.value = '';
   updateQuizSubjectPills();
   renderQuizTopicChips(quizSelectedSubject);
 });
@@ -794,6 +796,7 @@ function finishQuiz() {
 quizRestartButton.addEventListener('click', () => {
   quizSummary.hidden = true;
   quizSetupForm.hidden = false;
+  quizTopicInput.value = '';
   quizState = null;
 });
 
