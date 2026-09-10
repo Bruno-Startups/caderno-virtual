@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Caderno Virtual: selecione a matéria, pesquise o assunto e receba explicação, resumo, imagens e exercícios." />
     <title>Caderno Virtual — sua enciclopédia de estudos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -108,21 +111,8 @@
           </div>
 
           <form id="study-form">
-            <div class="context-grid">
-              <label for="school-year">Seu ano escolar <span class="optional-tag">opcional</span>
-                <select id="school-year" name="schoolYear">
-                  <option value="" selected>Deixe a IA calibrar</option>
-                  <option>6º ano do Fundamental</option><option>7º ano do Fundamental</option><option>8º ano do Fundamental</option><option>9º ano do Fundamental</option>
-                  <option>1º ano do Ensino Médio</option><option>2º ano do Ensino Médio</option><option>3º ano do Ensino Médio</option>
-                </select>
-              </label>
-              <label for="subject">Matéria <span class="optional-tag">opcional</span>
-                <select id="subject" name="subject">
-                  <option value="" selected>Deixe a IA identificar</option>
-                  <option>Matemática</option><option>Português</option><option>História</option><option>Geografia</option><option>Ciências</option><option>Inglês</option><option>Física</option><option>Química</option><option>Biologia</option>
-                </select>
-              </label>
-            </div>
+            <input type="hidden" id="school-year" name="schoolYear" value="" />
+            <input type="hidden" id="subject" name="subject" value="" />
 
             <label class="question-label" for="topic">Qual assunto você quer estudar? <span aria-hidden="true">*</span></label>
             <input id="topic" name="topic" type="text" required placeholder="Ex.: Revolução Francesa, equação de 1º grau, fotossíntese..." />
@@ -156,9 +146,9 @@
               <div id="explanation-content"></div>
             </section>
             <section class="images-block">
-              <h3>Imagens</h3>
+              <h3>Saiba mais</h3>
               <div id="images-grid" class="images-grid"></div>
-              <p id="images-empty" class="images-empty" hidden>Não encontramos imagens relevantes para este assunto.</p>
+              <p id="images-empty" class="images-empty" hidden>Não encontramos um artigo relacionado a este assunto.</p>
             </section>
           </div>
 

@@ -71,14 +71,21 @@ function renderHeroSubjects() {
     applySubjectColor(pill.dataset.subject);
     renderTopicChips(pill.dataset.subject);
     updateActivePill();
-    subjectDropdown.sync();
     topicInput.focus();
   });
 }
 
-function updateActivePill() {
+function updateActivePill(animate = false) {
   const current = form.elements.subject.value;
-  document.querySelectorAll('.subject-pill').forEach((pill) => pill.classList.toggle('active', pill.dataset.subject === current));
+  document.querySelectorAll('.subject-pill').forEach((pill) => {
+    const isActive = pill.dataset.subject === current;
+    pill.classList.toggle('active', isActive);
+    if (isActive && animate) {
+      pill.classList.remove('pill-auto-detect');
+      void pill.offsetWidth;
+      pill.classList.add('pill-auto-detect');
+    }
+  });
 }
 
 function renderTopicChips(subject) {
@@ -102,86 +109,6 @@ form.elements.subject.addEventListener('change', () => {
 
 const escapeHtml = (value) => value.replace(/[&<>'"]/g, (character) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#039;', '"':'&quot;' })[character]);
 const bold = (text) => escapeHtml(text).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-
-function enhanceSelect(select, { colorize = false } = {}) {
-  const wrap = document.createElement('div');
-  wrap.className = 'cs-wrap';
-  select.classList.add('cs-native');
-  select.parentNode.insertBefore(wrap, select);
-  wrap.appendChild(select);
-
-  const trigger = document.createElement('button');
-  trigger.type = 'button';
-  trigger.className = 'cs-trigger';
-  trigger.innerHTML = '<span class="cs-trigger-label"></span><svg width="16" height="10" viewBox="0 0 16 10"><path d="M1 1l7 7 7-7" stroke="#1f66b2" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  wrap.appendChild(trigger);
-
-  const menu = document.createElement('div');
-  menu.className = 'cs-menu';
-  menu.setAttribute('role', 'listbox');
-  wrap.appendChild(menu);
-
-  const label = trigger.querySelector('.cs-trigger-label');
-  let highlightIndex = -1;
-
-  function buildOptions() {
-    menu.innerHTML = '';
-    [...select.options].forEach((option) => {
-      const item = document.createElement('div');
-      item.className = 'cs-option';
-      item.setAttribute('role', 'option');
-      item.dataset.value = option.value;
-      const palette = colorize ? SUBJECT_COLORS[option.value] : null;
-      item.innerHTML = `<span class="cs-option-dot" ${palette ? `style="background:${palette.color};color:${palette.color}"` : ''}></span><span>${escapeHtml(option.textContent)}</span>`;
-      item.addEventListener('click', () => selectValue(option.value));
-      menu.appendChild(item);
-    });
-    syncSelected();
-  }
-
-  function syncSelected() {
-    const current = select.value;
-    const selectedOption = [...select.options].find((option) => option.value === current);
-    label.textContent = selectedOption ? selectedOption.textContent : '';
-    [...menu.children].forEach((item) => item.classList.toggle('selected', item.dataset.value === current));
-  }
-
-  function selectValue(value) {
-    select.value = value;
-    syncSelected();
-    closeMenu();
-    select.dispatchEvent(new Event('change', { bubbles: true }));
-  }
-
-  function openMenu() { wrap.classList.add('open'); highlightIndex = [...menu.children].findIndex((item) => item.classList.contains('selected')); }
-  function closeMenu() { wrap.classList.remove('open'); }
-
-  trigger.addEventListener('click', () => { wrap.classList.contains('open') ? closeMenu() : openMenu(); });
-
-  trigger.addEventListener('keydown', (event) => {
-    const items = [...menu.children];
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      event.preventDefault();
-      if (!wrap.classList.contains('open')) { openMenu(); return; }
-      highlightIndex = Math.min(items.length - 1, Math.max(0, highlightIndex + (event.key === 'ArrowDown' ? 1 : -1)));
-      items.forEach((item, i) => item.classList.toggle('highlight', i === highlightIndex));
-      items[highlightIndex]?.scrollIntoView({ block: 'nearest' });
-    } else if (event.key === 'Enter' && wrap.classList.contains('open')) {
-      event.preventDefault();
-      if (items[highlightIndex]) selectValue(items[highlightIndex].dataset.value);
-    } else if (event.key === 'Escape') {
-      closeMenu();
-    }
-  });
-
-  document.addEventListener('click', (event) => { if (!wrap.contains(event.target)) closeMenu(); });
-
-  buildOptions();
-  return { sync: syncSelected };
-}
-
-const schoolYearDropdown = enhanceSelect(form.elements.schoolYear);
-const subjectDropdown = enhanceSelect(form.elements.subject, { colorize: true });
 
 function getHistory() { try { return JSON.parse(localStorage.getItem(storageKey)) || {}; } catch { return {}; } }
 function saveHistory(history) { localStorage.setItem(storageKey, JSON.stringify(history)); renderHistory(); }
@@ -252,7 +179,6 @@ function renderHistory() {
         form.elements.subject.value = subject;
         applySubjectColor(subject);
         updateActivePill();
-        subjectDropdown.sync();
         showAnswer(item, false);
       });
       const deleteBtn = document.createElement('button');
@@ -274,41 +200,44 @@ function renderExplanation(text) {
   return withBold.split(/\n\s*\n/).filter(Boolean).map((paragraph) => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`).join('');
 }
 
-async function fetchImages(query) {
+async function fetchWikipediaSummary(query) {
   try {
-    const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=4&gsrnamespace=6&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=300&format=json&origin=*`;
-    const response = await fetch(url);
-    const data = await response.json();
-    const pages = data?.query?.pages;
-    if (!pages) return [];
-    return Object.values(pages)
-      .filter((page) => page.imageinfo?.[0]?.thumburl)
-      .map((page) => ({
-        thumb: page.imageinfo[0].thumburl,
-        title: page.title.replace(/^File:/, '').replace(/\.(jpg|jpeg|png|svg|gif)$/i, ''),
-        source: page.imageinfo[0].descriptionurl,
-      }));
+    const searchUrl = `https://pt.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=1&namespace=0&format=json&origin=*`;
+    const searchResponse = await fetch(searchUrl);
+    const searchData = await searchResponse.json();
+    const title = searchData?.[1]?.[0];
+    if (!title) return null;
+
+    const summaryUrl = `https://pt.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
+    const summaryResponse = await fetch(summaryUrl);
+    if (!summaryResponse.ok) return null;
+    const summary = await summaryResponse.json();
+    if (summary.type === 'disambiguation') return null;
+
+    return {
+      title: summary.title,
+      thumb: summary.thumbnail?.source || null,
+      pageUrl: summary.content_urls?.desktop?.page || null,
+    };
   } catch {
-    return [];
+    return null;
   }
 }
 
-function renderImages(images) {
+function renderWikipediaCard(article) {
   imagesGrid.innerHTML = '';
-  if (!images || images.length === 0) {
+  if (!article || !article.pageUrl) {
     imagesEmpty.hidden = false;
     return;
   }
   imagesEmpty.hidden = true;
-  images.forEach((image) => {
-    const card = document.createElement('a');
-    card.className = 'image-card';
-    card.href = image.source;
-    card.target = '_blank';
-    card.rel = 'noopener noreferrer';
-    card.innerHTML = `<img src="${image.thumb}" alt="${escapeHtml(image.title)}" loading="lazy" /><p>${escapeHtml(image.title)}</p>`;
-    imagesGrid.appendChild(card);
-  });
+  const card = document.createElement('a');
+  card.className = 'wiki-card';
+  card.href = article.pageUrl;
+  card.target = '_blank';
+  card.rel = 'noopener noreferrer';
+  card.innerHTML = `${article.thumb ? `<img src="${article.thumb}" alt="${escapeHtml(article.title)}" loading="lazy" />` : ''}<div class="wiki-card-text"><strong>${escapeHtml(article.title)}</strong><span>Ver artigo completo na Wikipédia →</span></div>`;
+  imagesGrid.appendChild(card);
 }
 
 function renderMindMap(topic, keywords, color, softColor) {
@@ -388,7 +317,7 @@ function showAnswer(item, shouldScroll = true) {
   const palette = SUBJECT_COLORS[item.subject] || SUBJECT_COLORS['Matemática'];
   renderMindMap(item.topic, item.keywords, palette.color, palette.soft);
   explanationContent.innerHTML = renderExplanation(item.explanation);
-  renderImages(item.images);
+  renderWikipediaCard(item.images);
   exercisesSection.hidden = true;
   answer.hidden = false;
   if (shouldScroll) answer.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -414,19 +343,17 @@ form.addEventListener('submit', async (event) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subject, schoolYear, topic }),
       }),
-      fetchImages(`${topic} ${subject}`),
+      fetchWikipediaSummary(`${topic} ${subject}`),
     ]);
     const data = await contentResponse.json();
     if (!contentResponse.ok) throw new Error(data.error || 'Não foi possível gerar o conteúdo agora.');
 
     const finalSubject = data.subject || subject;
-    if (finalSubject !== subject && [...form.elements.subject.options].some((option) => option.value === finalSubject)) {
-      form.elements.subject.value = finalSubject;
-    }
+    const wasAutoDetected = !subject && !!finalSubject;
+    form.elements.subject.value = finalSubject;
     applySubjectColor(finalSubject);
-    updateActivePill();
+    updateActivePill(wasAutoDetected);
     renderTopicChips(finalSubject);
-    subjectDropdown.sync();
 
     const item = { subject: finalSubject, schoolYear, topic: data.topic || topic, summary: data.summary, keywords: data.keywords, explanation: data.explanation, images };
     addToHistory(item);
@@ -490,8 +417,6 @@ clearHistory.addEventListener('click', () => { localStorage.removeItem(storageKe
 
 newQuestion.addEventListener('click', () => {
   form.reset();
-  schoolYearDropdown.sync();
-  subjectDropdown.sync();
   applySubjectColor('');
   updateActivePill();
   renderTopicChips('');
