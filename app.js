@@ -186,10 +186,19 @@ const subjectDropdown = enhanceSelect(form.elements.subject, { colorize: true })
 function getHistory() { try { return JSON.parse(localStorage.getItem(storageKey)) || {}; } catch { return {}; } }
 function saveHistory(history) { localStorage.setItem(storageKey, JSON.stringify(history)); renderHistory(); }
 
+function normalizeTopic(text) {
+  return (text || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
 function addToHistory(item) {
   const history = getHistory();
   if (!history[item.subject]) history[item.subject] = [];
-  history[item.subject] = history[item.subject].filter((saved) => saved.topic !== item.topic);
+  const normalizedNew = normalizeTopic(item.topic);
+  history[item.subject] = history[item.subject].filter((saved) => normalizeTopic(saved.topic) !== normalizedNew);
   history[item.subject].unshift(item);
   history[item.subject] = history[item.subject].slice(0, 15);
   saveHistory(history);
@@ -492,6 +501,23 @@ newQuestion.addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
+function dedupExistingHistory() {
+  const history = getHistory();
+  let changed = false;
+  Object.keys(history).forEach((subject) => {
+    const seen = new Map();
+    history[subject].forEach((item) => {
+      const key = normalizeTopic(item.topic);
+      if (!seen.has(key)) seen.set(key, item);
+    });
+    const deduped = [...seen.values()];
+    if (deduped.length !== history[subject].length) changed = true;
+    history[subject] = deduped;
+  });
+  if (changed) localStorage.setItem(storageKey, JSON.stringify(history));
+}
+
 renderHeroSubjects();
 renderTopicChips('');
+dedupExistingHistory();
 renderHistory();
