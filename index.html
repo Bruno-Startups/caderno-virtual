@@ -82,12 +82,6 @@
 
         <section class="quick-start" aria-label="Como funciona">
           <div class="step-card">
-            <div class="step-icon" style="--step-color:#1f66b2; --step-bg:#eaf3ff">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15 4v4a1 1 0 0 0 1 1h4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 13h8M8 16.5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            </div>
-            <div><strong>Matéria e ano</strong><span>Escolha ou deixe a IA identificar</span></div>
-          </div>
-          <div class="step-card">
             <div class="step-icon" style="--step-color:#0f9b8e; --step-bg:#e4f8f5">
               <svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="m19.5 19.5-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
             </div>
@@ -184,6 +178,14 @@
           </div>
           <p class="quiz-disclaimer">As questões são criadas pela IA, inspiradas no estilo de provas reais — não são questões oficiais do ENEM ou de vestibulares específicos.</p>
 
+          <section id="quiz-history-section" class="quiz-history-section" hidden>
+            <div class="quiz-history-heading">
+              <h3>Seu desempenho</h3>
+              <button type="button" id="quiz-clear-history" class="icon-button" aria-label="Limpar histórico de simulados">×</button>
+            </div>
+            <div id="quiz-history-list" class="quiz-history-list"></div>
+          </section>
+
           <form id="quiz-setup-form">
             <fieldset>
               <legend>Modo de preparação</legend>
@@ -202,6 +204,8 @@
 
             <label class="question-label" for="quiz-topic">Assunto <span aria-hidden="true">*</span></label>
             <input id="quiz-topic" name="quizTopic" type="text" required placeholder="Ex.: funções do 2º grau, revolução industrial..." />
+            <p class="input-hint">Clique numa sugestão ou digite o assunto que quiser.</p>
+            <div id="quiz-topic-chips" class="topic-chips"></div>
 
             <div class="quiz-field-row quiz-field-row-inline">
               <div>

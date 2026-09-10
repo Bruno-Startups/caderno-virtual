@@ -486,6 +486,19 @@ const quizRestartButton = document.querySelector('#quiz-restart-button');
 let quizSelectedSubject = '';
 let quizState = null;
 
+function renderQuizTopicChips(subject) {
+  const container = document.querySelector('#quiz-topic-chips');
+  const topics = EXAMPLE_TOPICS[subject] || EXAMPLE_TOPICS[''];
+  container.innerHTML = topics.map((topic) => `<button type="button" class="topic-chip">${escapeHtml(topic)}</button>`).join('');
+}
+
+document.querySelector('#quiz-topic-chips').addEventListener('click', (event) => {
+  const chip = event.target.closest('.topic-chip');
+  if (!chip) return;
+  quizTopicInput.value = chip.textContent;
+  quizTopicInput.focus();
+});
+
 function renderQuizSubjectPills() {
   quizSubjectPillsContainer.innerHTML = Object.keys(SUBJECT_COLORS).map((subject) => {
     const palette = SUBJECT_COLORS[subject];
@@ -493,6 +506,7 @@ function renderQuizSubjectPills() {
   }).join('');
   quizSelectedSubject = Object.keys(SUBJECT_COLORS)[0];
   updateQuizSubjectPills();
+  renderQuizTopicChips(quizSelectedSubject);
 }
 
 function updateQuizSubjectPills() {
@@ -506,6 +520,7 @@ quizSubjectPillsContainer.addEventListener('click', (event) => {
   if (!pill) return;
   quizSelectedSubject = pill.dataset.subject;
   updateQuizSubjectPills();
+  renderQuizTopicChips(quizSelectedSubject);
 });
 
 function wirePillSelect(container, hiddenInput) {
@@ -527,6 +542,63 @@ function saveQuizRecord(record) {
   history.unshift(record);
   localStorage.setItem(quizStorageKey, JSON.stringify(history.slice(0, 300)));
 }
+
+const quizHistorySection = document.querySelector('#quiz-history-section');
+const quizHistoryListEl = document.querySelector('#quiz-history-list');
+const quizClearHistoryButton = document.querySelector('#quiz-clear-history');
+const MODE_LABELS = { enem: 'ENEM', vestibular: 'Vestibular', escolar: 'Prova escolar', revisao: 'Revisão geral' };
+
+function renderQuizHistorySummary() {
+  const records = getQuizHistory();
+  if (records.length === 0) {
+    quizHistorySection.hidden = true;
+    return;
+  }
+  quizHistorySection.hidden = false;
+
+  const bySubject = {};
+  records.forEach((record) => {
+    if (!bySubject[record.subject]) bySubject[record.subject] = { correct: 0, wrong: 0, modes: new Set(), weak: {} };
+    const bucket = bySubject[record.subject];
+    if (record.correct) bucket.correct += 1;
+    else {
+      bucket.wrong += 1;
+      bucket.weak[record.topic] = (bucket.weak[record.topic] || 0) + 1;
+    }
+    bucket.modes.add(record.mode);
+  });
+
+  quizHistoryListEl.innerHTML = Object.entries(bySubject).map(([subject, stats]) => {
+    const palette = SUBJECT_COLORS[subject] || { color: '#5e7da1' };
+    const total = stats.correct + stats.wrong;
+    const percent = total > 0 ? Math.round((stats.correct / total) * 100) : 0;
+    const modesLabel = [...stats.modes].map((mode) => MODE_LABELS[mode] || mode).join(', ');
+    const weakEntries = Object.entries(stats.weak).sort((a, b) => b[1] - a[1]);
+    const weakNote = weakEntries.length > 0
+      ? `<p class="quiz-history-weak">Vale revisar: ${escapeHtml(weakEntries[0][0])} (${weakEntries[0][1]} erro${weakEntries[0][1] > 1 ? 's' : ''})</p>`
+      : '';
+    return `
+      <div class="quiz-history-card" style="border-left-color:${palette.color}">
+        <div class="quiz-history-card-top">
+          <div>
+            <p class="quiz-history-subject">${escapeHtml(subject)}</p>
+            <p class="quiz-history-meta">${total} questão${total > 1 ? 'ões' : ''} · ${escapeHtml(modesLabel)}</p>
+          </div>
+          <div class="quiz-history-percent">
+            <strong style="color:${palette.color}">${percent}%</strong>
+            <span>${stats.correct} acertos · ${stats.wrong} erros</span>
+          </div>
+        </div>
+        <div class="quiz-history-bar"><div style="width:${percent}%; background:${palette.color}"></div></div>
+        ${weakNote}
+      </div>`;
+  }).join('');
+}
+
+quizClearHistoryButton.addEventListener('click', () => {
+  localStorage.removeItem(quizStorageKey);
+  renderQuizHistorySummary();
+});
 
 quizSetupForm.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -560,6 +632,8 @@ async function loadQuizQuestion(similarTo) {
   quizStatementEl.textContent = '';
   quizFeedback.hidden = true;
   quizActions.hidden = true;
+  quizFinishButton.hidden = false;
+  quizNextButton.querySelector('span').textContent = 'Próxima questão';
   quizHintText.hidden = true;
   quizHintButton.hidden = false;
   quizSkillEl.hidden = true;
@@ -665,7 +739,10 @@ function answerQuizQuestion(chosenId) {
 
   quizActions.hidden = false;
   quizSimilarButton.hidden = isCorrect;
-  quizNextButton.hidden = quizState.index + 1 >= quizState.total;
+  const isLastQuestion = quizState.index + 1 >= quizState.total;
+  quizNextButton.hidden = false;
+  quizNextButton.querySelector('span').textContent = isLastQuestion ? 'Ver resultado' : 'Próxima questão';
+  quizFinishButton.hidden = isLastQuestion;
 
   if (isCorrect) {
     const currentLevel = DIFFICULTY_ORDER.indexOf(quizState.difficulty);
@@ -673,10 +750,6 @@ function answerQuizQuestion(chosenId) {
   } else {
     const currentLevel = DIFFICULTY_ORDER.indexOf(quizState.difficulty);
     quizState.difficulty = DIFFICULTY_ORDER[Math.max(currentLevel - 1, 0)];
-  }
-
-  if (quizState.index + 1 >= quizState.total) {
-    quizNextButton.hidden = true;
   }
 }
 
@@ -686,6 +759,10 @@ quizSimilarButton.addEventListener('click', async () => {
 });
 
 quizNextButton.addEventListener('click', async () => {
+  if (quizState.index + 1 >= quizState.total) {
+    finishQuiz();
+    return;
+  }
   quizState.index += 1;
   quizAlternativesEl.dataset.answered = 'false';
   await loadQuizQuestion();
@@ -710,6 +787,8 @@ function finishQuiz() {
     const items = weakEntries.map(([key, count]) => `<li>${escapeHtml(key)} <span>(${count} erro${count > 1 ? 's' : ''})</span></li>`).join('');
     quizSummaryWeak.innerHTML = `<p class="quiz-summary-note">Vale revisar:</p><ul class="quiz-summary-list">${items}</ul>`;
   }
+
+  renderQuizHistorySummary();
 }
 
 quizRestartButton.addEventListener('click', () => {
@@ -719,3 +798,4 @@ quizRestartButton.addEventListener('click', () => {
 });
 
 renderQuizSubjectPills();
+renderQuizHistorySummary();
