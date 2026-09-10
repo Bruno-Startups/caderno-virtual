@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Caderno Virtual: selecione a matéria, pesquise o assunto e receba explicação, resumo, imagens e exercícios." />
+    <title>Caderno Virtual — sua enciclopédia de estudos</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="intro-overlay" id="intro-overlay" aria-hidden="true">
+      <svg class="intro-notebook" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+        <rect x="26" y="6" width="164" height="228" rx="10" fill="#ffffff" stroke="#dce3ec" stroke-width="2" />
+        <g class="intro-page-lines" stroke="#c7d2e0" stroke-width="2.4">
+          <line x1="58" y1="46" x2="168" y2="46" />
+          <line x1="58" y1="64" x2="168" y2="64" />
+          <line x1="58" y1="82" x2="168" y2="82" />
+          <line x1="58" y1="100" x2="168" y2="100" />
+          <line x1="58" y1="118" x2="150" y2="118" />
+        </g>
+        <g class="intro-cover">
+          <rect x="26" y="6" width="164" height="228" rx="10" fill="#1f66b2" />
+          <rect x="26" y="6" width="164" height="228" rx="10" fill="none" stroke="#12141a" stroke-width="3" />
+          <rect x="26" y="6" width="26" height="228" fill="#12141a" />
+          <g stroke="#ffca5c" stroke-width="3">
+            <line x1="10" y1="28" x2="42" y2="28" />
+            <line x1="10" y1="56" x2="42" y2="56" />
+            <line x1="10" y1="84" x2="42" y2="84" />
+            <line x1="10" y1="112" x2="42" y2="112" />
+            <line x1="10" y1="140" x2="42" y2="140" />
+            <line x1="10" y1="168" x2="42" y2="168" />
+            <line x1="10" y1="196" x2="42" y2="196" />
+            <line x1="10" y1="212" x2="42" y2="212" />
+          </g>
+          <rect x="82" y="98" width="80" height="7" rx="3.5" fill="#ffca5c" />
+          <rect x="82" y="118" width="58" height="7" rx="3.5" fill="#8fbde6" />
+        </g>
+      </svg>
+      <p class="intro-caption">Caderno Virtual</p>
+    </div>
+    <div class="bg-decor" aria-hidden="true">
+      <svg class="decor-shape decor-1" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#1f66b2" /></svg>
+      <svg class="decor-shape decor-2" viewBox="0 0 200 200"><rect x="20" y="20" width="160" height="160" rx="40" fill="#0f9b8e" /></svg>
+      <svg class="decor-shape decor-3" viewBox="0 0 200 200"><polygon points="100,10 190,180 10,180" fill="#c9821e" /></svg>
+      <svg class="decor-shape decor-4" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#7c5cd6" /></svg>
+      <svg class="decor-dots" viewBox="0 0 120 120"><g fill="#1f66b2"><circle cx="6" cy="6" r="2.4"/><circle cx="26" cy="6" r="2.4"/><circle cx="46" cy="6" r="2.4"/><circle cx="66" cy="6" r="2.4"/><circle cx="86" cy="6" r="2.4"/><circle cx="106" cy="6" r="2.4"/><circle cx="6" cy="26" r="2.4"/><circle cx="26" cy="26" r="2.4"/><circle cx="46" cy="26" r="2.4"/><circle cx="66" cy="26" r="2.4"/><circle cx="86" cy="26" r="2.4"/><circle cx="106" cy="26" r="2.4"/><circle cx="6" cy="46" r="2.4"/><circle cx="26" cy="46" r="2.4"/><circle cx="46" cy="46" r="2.4"/><circle cx="66" cy="46" r="2.4"/><circle cx="86" cy="46" r="2.4"/><circle cx="106" cy="46" r="2.4"/></g></svg>
+    </div>
+    <a class="skip-link" href="#pesquisa">Pular para a pesquisa</a>
+    <main class="page-shell">
+      <aside class="sidebar" aria-label="Seu histórico">
+        <a class="brand" href="#top" aria-label="Caderno Virtual, ir ao início">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="2" width="16" height="20" rx="2.5" fill="#12141a"/><rect x="4" y="2" width="5" height="20" fill="#000"/><g stroke="#ffca5c" stroke-width="1.4"><line x1="1.6" y1="6" x2="7.5" y2="6"/><line x1="1.6" y1="10" x2="7.5" y2="10"/><line x1="1.6" y1="14" x2="7.5" y2="14"/><line x1="1.6" y1="18" x2="7.5" y2="18"/></g><rect x="11.5" y="8" width="7" height="2" rx="1" fill="#e7ecf3"/><rect x="11.5" y="12.5" width="5" height="2" rx="1" fill="#e7ecf3"/></svg>
+          </span>
+          <span>Caderno<br />Virtual</span>
+        </a>
+        <div class="history-heading">
+          <div>
+            <p class="history-title"><span class="history-title-icon" aria-hidden="true">🕘</span> Seu histórico</p>
+            <p class="history-caption">Seus assuntos ficam salvos por matéria, neste aparelho.</p>
+          </div>
+          <button class="icon-button" id="clear-history" type="button" aria-label="Limpar histórico" hidden>×</button>
+        </div>
+        <nav id="history-list" class="history-list" aria-label="Assuntos anteriores">
+          <p class="empty-history">Quando você pesquisar um assunto, ele vai aparecer aqui.</p>
+        </nav>
+        <p class="sidebar-note">Seu histórico é privado e fica só neste navegador.</p>
+      </aside>
+
+      <section class="content" id="top">
+        <header class="hero">
+          <div>
+            <p class="pill">Grátis · sem cadastro</p>
+            <h1>O conteúdo de todas as matérias, no seu nível.</h1>
+            <p class="hero-copy">Pesquise o assunto e receba explicação, resumo, imagens reais e exercícios pra praticar. Ano e matéria são opcionais — a IA identifica sozinha.</p>
+          </div>
+          <div class="hero-subjects" aria-hidden="true" id="hero-subjects"></div>
+        </header>
+
+        <section class="quick-start" aria-label="Como funciona">
+          <div class="step-card">
+            <div class="step-icon" style="--step-color:#1f66b2; --step-bg:#eaf3ff">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15 4v4a1 1 0 0 0 1 1h4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 13h8M8 16.5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+            <div><strong>Matéria e ano</strong><span>Escolha ou deixe a IA identificar</span></div>
+          </div>
+          <div class="step-card">
+            <div class="step-icon" style="--step-color:#0f9b8e; --step-bg:#e4f8f5">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="m19.5 19.5-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+            <div><strong>Pesquise o assunto</strong><span>Um tópico ou uma dúvida específica</span></div>
+          </div>
+          <div class="step-card">
+            <div class="step-icon" style="--step-color:#c9821e; --step-bg:#fbf0e1">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 5h6l2 2h8v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 12h8M8 15.5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+            <div><strong>Estude com apoio visual</strong><span>Imagens reais e exercícios pra praticar</span></div>
+          </div>
+        </section>
+
+        <section class="study-card" aria-labelledby="form-title" id="pesquisa">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Comece por aqui</p>
+              <h2 id="form-title">O que você quer estudar hoje?</h2>
+            </div>
+            <p class="required-note"><span aria-hidden="true">*</span> só o assunto é obrigatório</p>
+          </div>
+
+          <form id="study-form">
+            <div class="context-grid">
+              <label for="school-year">Seu ano escolar <span class="optional-tag">opcional</span>
+                <select id="school-year" name="schoolYear">
+                  <option value="" selected>Deixe a IA calibrar</option>
+                  <option>6º ano do Fundamental</option><option>7º ano do Fundamental</option><option>8º ano do Fundamental</option><option>9º ano do Fundamental</option>
+                  <option>1º ano do Ensino Médio</option><option>2º ano do Ensino Médio</option><option>3º ano do Ensino Médio</option>
+                </select>
+              </label>
+              <label for="subject">Matéria <span class="optional-tag">opcional</span>
+                <select id="subject" name="subject">
+                  <option value="" selected>Deixe a IA identificar</option>
+                  <option>Matemática</option><option>Português</option><option>História</option><option>Geografia</option><option>Ciências</option><option>Inglês</option><option>Física</option><option>Química</option><option>Biologia</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="question-label" for="topic">Qual assunto você quer estudar? <span aria-hidden="true">*</span></label>
+            <input id="topic" name="topic" type="text" required placeholder="Ex.: Revolução Francesa, equação de 1º grau, fotossíntese..." />
+            <p class="input-hint">Pode ser um tópico do livro, ou uma dúvida específica.</p>
+            <div id="topic-chips" class="topic-chips"></div>
+
+            <div class="form-footer">
+              <p class="privacy-note">Não inclua dados pessoais, senhas ou informações de outras pessoas.</p>
+              <button class="primary-button" type="submit" id="submit-button"><span>Estudar esse assunto</span><span aria-hidden="true">→</span></button>
+            </div>
+          </form>
+        </section>
+
+        <section id="answer" class="answer-card" aria-live="polite" aria-labelledby="answer-title" hidden>
+          <header class="answer-header">
+            <div class="answer-icon" aria-hidden="true">✦</div>
+            <div><p id="answer-meta" class="eyebrow">Seu conteúdo</p><h2 id="answer-title">Vamos estudar isso</h2></div>
+          </header>
+
+          <div class="answer-content">
+            <section class="summary-block">
+              <h3>Resumo rápido</h3>
+              <ul id="summary-list"></ul>
+            </section>
+            <section class="mindmap-block">
+              <h3>Mapa mental</h3>
+              <div id="mindmap-container"></div>
+            </section>
+            <section class="explanation-block">
+              <h3>Explicação completa</h3>
+              <div id="explanation-content"></div>
+            </section>
+            <section class="images-block">
+              <h3>Imagens</h3>
+              <div id="images-grid" class="images-grid"></div>
+              <p id="images-empty" class="images-empty" hidden>Não encontramos imagens relevantes para este assunto.</p>
+            </section>
+          </div>
+
+          <footer class="answer-footer">
+            <p>Confira o conteúdo e adapte-o com suas próprias palavras.</p>
+            <div class="answer-footer-actions">
+              <button id="generate-exercises" class="secondary-button" type="button">Gerar exercícios</button>
+              <button id="new-question" class="secondary-button" type="button">Pesquisar outro assunto</button>
+            </div>
+          </footer>
+        </section>
+
+        <section id="exercises" class="exercises-card" aria-live="polite" hidden>
+          <header class="exercises-header">
+            <h2>Exercícios para praticar</h2>
+            <button id="exercises-close" class="icon-button" type="button" aria-label="Fechar exercícios">×</button>
+          </header>
+          <div id="exercises-list" class="exercises-list"></div>
+        </section>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
