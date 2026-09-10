@@ -455,6 +455,7 @@ const DIFFICULTY_LABELS = { facil: 'Fácil', medio: 'Médio', dificil: 'Difícil
 
 const quizSetupForm = document.querySelector('#quiz-setup-form');
 const quizSubjectPillsContainer = document.querySelector('#quiz-subject-pills');
+const quizTopicGroup = document.querySelector('#quiz-topic-group');
 const quizTopicInput = document.querySelector('#quiz-topic');
 const quizDifficultySelect = document.querySelector('#quiz-difficulty-select');
 const quizDifficultyInput = document.querySelector('#quiz-difficulty');
@@ -464,6 +465,7 @@ const quizStartButton = document.querySelector('#quiz-start-button');
 const quizActive = document.querySelector('#quiz-active');
 const quizProgressLabel = document.querySelector('#quiz-progress-label');
 const quizProgressFill = document.querySelector('#quiz-progress-fill');
+const quizSubjectTopicEl = document.querySelector('#quiz-subject-topic');
 const quizSkillEl = document.querySelector('#quiz-skill');
 const quizStatementEl = document.querySelector('#quiz-statement');
 const quizAlternativesEl = document.querySelector('#quiz-alternatives');
@@ -504,9 +506,10 @@ function renderQuizSubjectPills() {
     const palette = SUBJECT_COLORS[subject];
     return `<button type="button" class="subject-pill" data-subject="${subject}" style="--pill-bg:${palette.soft}; --pill-fg:${palette.color}"><span class="dot"></span>${subject}</button>`;
   }).join('');
-  quizSelectedSubject = Object.keys(SUBJECT_COLORS)[0];
+  quizSelectedSubject = '';
   updateQuizSubjectPills();
-  renderQuizTopicChips(quizSelectedSubject);
+  setQuizTopicFieldVisibility(true);
+  renderQuizTopicChips('');
 }
 
 function updateQuizSubjectPills() {
@@ -515,14 +518,25 @@ function updateQuizSubjectPills() {
   });
 }
 
+function setQuizTopicFieldVisibility(visible) {
+  quizTopicGroup.hidden = !visible;
+  quizTopicInput.required = visible;
+  if (!visible) quizTopicInput.value = '';
+}
+
 quizSubjectPillsContainer.addEventListener('click', (event) => {
   const pill = event.target.closest('.subject-pill');
   if (!pill) return;
-  if (pill.dataset.subject === quizSelectedSubject) return;
+  if (pill.dataset.subject === quizSelectedSubject) {
+    quizSelectedSubject = '';
+    updateQuizSubjectPills();
+    setQuizTopicFieldVisibility(true);
+    renderQuizTopicChips('');
+    return;
+  }
   quizSelectedSubject = pill.dataset.subject;
-  quizTopicInput.value = '';
   updateQuizSubjectPills();
-  renderQuizTopicChips(quizSelectedSubject);
+  setQuizTopicFieldVisibility(false);
 });
 
 function wirePillSelect(container, hiddenInput) {
@@ -606,8 +620,8 @@ quizSetupForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!quizSetupForm.reportValidity()) return;
   const mode = quizSetupForm.elements.quizMode.value;
-  const topic = quizTopicInput.value.trim();
-  if (!topic) return;
+  const topic = quizTopicGroup.hidden ? '' : quizTopicInput.value.trim();
+  if (!quizSelectedSubject && !topic) return;
 
   quizState = {
     mode,
@@ -639,6 +653,7 @@ async function loadQuizQuestion(similarTo) {
   quizHintText.hidden = true;
   quizHintButton.hidden = false;
   quizSkillEl.hidden = true;
+  quizSubjectTopicEl.textContent = '';
 
   try {
     const response = await fetch('/api/question', {
@@ -665,7 +680,10 @@ async function loadQuizQuestion(similarTo) {
 }
 
 function renderQuizQuestion(data) {
+  quizState.subject = data.subject;
+  quizState.topic = data.topic;
   updateQuizProgress();
+  quizSubjectTopicEl.textContent = `${data.subject} · ${data.topic}`;
   if (data.skill && data.skill.toLowerCase() !== 'não aplicável') {
     quizSkillEl.textContent = data.skill;
     quizSkillEl.hidden = false;
@@ -796,7 +814,10 @@ function finishQuiz() {
 quizRestartButton.addEventListener('click', () => {
   quizSummary.hidden = true;
   quizSetupForm.hidden = false;
-  quizTopicInput.value = '';
+  quizSelectedSubject = '';
+  updateQuizSubjectPills();
+  setQuizTopicFieldVisibility(true);
+  renderQuizTopicChips('');
   quizState = null;
 });
 

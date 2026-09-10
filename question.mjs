@@ -1,3 +1,5 @@
+const SUBJECT_LIST = ['Matemática', 'Português', 'História', 'Geografia', 'Ciências', 'Inglês', 'Física', 'Química', 'Biologia'];
+
 const MODE_GUIDANCE = {
   enem: `Modo ENEM. Priorize: contextualização, interpretação de texto, gráficos/tabelas/dados quando fizer sentido, situações-problema do cotidiano, raciocínio em vez de memorização pura, e possibilidade de interdisciplinaridade. Use uma linguagem parecida com a de uma avaliação nacional brasileira, mas NUNCA copie ou parafraseie de perto uma questão oficial real — crie um enunciado inteiramente original. Se fizer sentido, descreva em HABILIDADE a competência trabalhada (em texto livre, nunca invente um código oficial de habilidade da matriz).`,
   vestibular: `Modo Vestibular. Crie uma questão objetiva original com nível de dificuldade e formato aproximados ao de vestibulares brasileiros em geral. NÃO copie nem reproduza questões de nenhuma instituição específica, mesmo que o aluno tenha mencionado uma. O estilo é uma aproximação, nunca uma reprodução oficial.`,
@@ -45,6 +47,10 @@ A questão deve ter exatamente 5 alternativas (A a E), com apenas UMA correta e 
 
 Responda EXATAMENTE neste formato, com as marcações em linhas próprias, sem nada além disso:
 
+MATERIA: <a matéria correta para esta questão, escolhida apenas entre: ${SUBJECT_LIST.join(', ')}. Se a matéria já foi informada corretamente, repita ela mesma>
+
+ASSUNTO: <o assunto exato abordado nesta questão. Se o assunto já foi informado, repita-o de forma limpa; se não foi informado, escolha você mesmo um assunto específico e relevante dentro da matéria>
+
 HABILIDADE: <descreva em uma frase a habilidade/competência trabalhada, ou escreva "Não aplicável" se não fizer sentido>
 
 ENUNCIADO:
@@ -72,14 +78,16 @@ ERRO_COMUM: <um erro de raciocínio comum que leva a marcar uma alternativa erra
 
 DICA: <uma dica curta que ajuda sem entregar a resposta>`;
 
-  let user = `Matéria/área: ${subject}\nAssunto: ${topic}\nAno escolar/nível: ${schoolYear || 'não informado, calibre um nível intermediário'}\nDificuldade desejada: ${difficultyText}`;
+  let user = `Matéria/área: ${subject || 'não informada — identifique você mesmo a mais adequada'}\nAssunto: ${topic || 'não informado — escolha você mesmo um assunto específico dentro da matéria'}\nAno escolar/nível: ${schoolYear || 'não informado, calibre um nível intermediário'}\nDificuldade desejada: ${difficultyText}`;
   if (institution) user += `\nEstilo de referência (aproximado, não oficial): ${institution}`;
   if (similarTo) user += `\n\nO aluno errou uma questão parecida com esta anteriormente: "${similarTo}". Crie uma NOVA questão sobre o mesmo assunto e mesma dificuldade, com contexto e números diferentes, para reforçar o mesmo conceito.`;
 
   return { system, user };
 }
 
-function parseQuestion(raw) {
+function parseQuestion(raw, fallbackSubject, fallbackTopic) {
+  const materiaMatch = raw.match(/MATERIA:\s*(.+?)\s*\n/i);
+  const assuntoMatch = raw.match(/ASSUNTO:\s*(.+?)\s*\n/i);
   const habilidadeMatch = raw.match(/HABILIDADE:\s*(.+?)\s*\n/i);
   const enunciadoMatch = raw.match(/ENUNCIADO:\s*\n([\s\S]*?)\n\s*A\)/i);
   const altABlock = raw.match(/A\)\s*([\s\S]*?)\nB\)\s*([\s\S]*?)\nC\)\s*([\s\S]*?)\nD\)\s*([\s\S]*?)\nE\)\s*([\s\S]*?)\n\s*GABARITO:/i);
@@ -107,7 +115,13 @@ function parseQuestion(raw) {
     if (match) wrongExplanations[letter] = sanitizeMath(match[1].trim());
   });
 
+  const detectedSubject = materiaMatch ? materiaMatch[1].trim() : '';
+  const subject = SUBJECT_LIST.includes(detectedSubject) ? detectedSubject : (fallbackSubject || SUBJECT_LIST[0]);
+  const topic = assuntoMatch ? sanitizeMath(assuntoMatch[1].trim()) : (fallbackTopic || '');
+
   return {
+    subject,
+    topic,
     skill: habilidadeMatch ? sanitizeMath(habilidadeMatch[1].trim()) : '',
     statement: sanitizeMath(enunciadoMatch[1].trim()),
     alternatives,
@@ -142,7 +156,7 @@ export default async function handler(req, res) {
   if (!process.env.GROQ_API_KEY) return res.status(503).json({ error: 'A chave da IA ainda não foi configurada.' });
   try {
     const { mode, subject, topic, schoolYear, difficulty, institution, similarTo } = req.body || {};
-    if (!subject || !topic) return res.status(400).json({ error: 'Escolha uma matéria e um assunto.' });
+    if (!subject && !topic) return res.status(400).json({ error: 'Escolha uma matéria ou digite um assunto.' });
 
     const { system, user } = buildPrompt({ mode, subject, topic, schoolYear, difficulty, institution, similarTo });
 
@@ -151,7 +165,7 @@ export default async function handler(req, res) {
     for (let attempt = 0; attempt < 3 && !parsed; attempt += 1) {
       try {
         const raw = await callGroq(system, user);
-        parsed = parseQuestion(raw);
+        parsed = parseQuestion(raw, subject, topic);
       } catch (attemptError) {
         lastError = attemptError;
       }
@@ -160,8 +174,6 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       mode: mode || 'revisao',
-      subject,
-      topic,
       difficulty: difficulty || 'medio',
       aiGenerated: true,
       ...parsed,

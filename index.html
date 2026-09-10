@@ -199,13 +199,16 @@
 
             <div class="quiz-field-row">
               <label class="question-label" for="quiz-subject">Matéria ou área</label>
-              <div class="quiz-subject-pills" id="quiz-subject-pills"></div>
+            <div class="quiz-subject-pills" id="quiz-subject-pills"></div>
+            <p class="input-hint">Selecione uma matéria pra deixar a IA escolher o assunto, ou deixe sem selecionar e escreva um assunto específico abaixo.</p>
             </div>
 
-            <label class="question-label" for="quiz-topic">Assunto <span aria-hidden="true">*</span></label>
-            <input id="quiz-topic" name="quizTopic" type="text" required placeholder="Ex.: funções do 2º grau, revolução industrial..." />
-            <p class="input-hint">Clique numa sugestão ou digite o assunto que quiser.</p>
-            <div id="quiz-topic-chips" class="topic-chips"></div>
+            <div id="quiz-topic-group">
+              <label class="question-label" for="quiz-topic">Assunto <span aria-hidden="true">*</span></label>
+              <input id="quiz-topic" name="quizTopic" type="text" required placeholder="Ex.: funções do 2º grau, revolução industrial..." />
+              <p class="input-hint">Clique numa sugestão ou digite o assunto que quiser.</p>
+              <div id="quiz-topic-chips" class="topic-chips"></div>
+            </div>
 
             <div class="quiz-field-row quiz-field-row-inline">
               <div>
@@ -240,6 +243,7 @@
               <div class="quiz-progress-bar"><div id="quiz-progress-fill" class="quiz-progress-fill"></div></div>
             </div>
             <p class="quiz-ai-tag">✦ Questão gerada por IA — não é uma questão oficial</p>
+            <p id="quiz-subject-topic" class="quiz-subject-topic"></p>
             <p id="quiz-skill" class="quiz-skill" hidden></p>
             <p id="quiz-statement" class="quiz-statement"></p>
             <div id="quiz-alternatives" class="quiz-alternatives"></div>
