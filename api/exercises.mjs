@@ -23,6 +23,8 @@ export default async function handler(req, res) {
         model: 'openai/gpt-oss-120b',
         messages: [{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content: userPrompt }],
         max_tokens: 1100,
+        temperature: 0,
+        seed: 42,
       }),
     });
     const data = await groqResponse.json();
