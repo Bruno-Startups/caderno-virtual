@@ -446,3 +446,276 @@ renderHeroSubjects();
 renderTopicChips('');
 dedupExistingHistory();
 renderHistory();
+
+/* ===== Questões e Simulados ===== */
+
+const quizStorageKey = 'caderno-virtual-questoes-v1';
+const DIFFICULTY_ORDER = ['facil', 'medio', 'dificil'];
+const DIFFICULTY_LABELS = { facil: 'Fácil', medio: 'Médio', dificil: 'Difícil' };
+
+const quizSetupForm = document.querySelector('#quiz-setup-form');
+const quizSubjectPillsContainer = document.querySelector('#quiz-subject-pills');
+const quizTopicInput = document.querySelector('#quiz-topic');
+const quizDifficultySelect = document.querySelector('#quiz-difficulty-select');
+const quizDifficultyInput = document.querySelector('#quiz-difficulty');
+const quizCountSelect = document.querySelector('#quiz-count-select');
+const quizCountInput = document.querySelector('#quiz-count');
+const quizStartButton = document.querySelector('#quiz-start-button');
+const quizActive = document.querySelector('#quiz-active');
+const quizProgressLabel = document.querySelector('#quiz-progress-label');
+const quizProgressFill = document.querySelector('#quiz-progress-fill');
+const quizSkillEl = document.querySelector('#quiz-skill');
+const quizStatementEl = document.querySelector('#quiz-statement');
+const quizAlternativesEl = document.querySelector('#quiz-alternatives');
+const quizHintButton = document.querySelector('#quiz-hint-button');
+const quizHintText = document.querySelector('#quiz-hint-text');
+const quizFeedback = document.querySelector('#quiz-feedback');
+const quizFeedbackTitle = document.querySelector('#quiz-feedback-title');
+const quizFeedbackBody = document.querySelector('#quiz-feedback-body');
+const quizActions = document.querySelector('#quiz-actions');
+const quizSimilarButton = document.querySelector('#quiz-similar-button');
+const quizNextButton = document.querySelector('#quiz-next-button');
+const quizFinishButton = document.querySelector('#quiz-finish-button');
+const quizSummary = document.querySelector('#quiz-summary');
+const quizStatCorrect = document.querySelector('#quiz-stat-correct');
+const quizStatWrong = document.querySelector('#quiz-stat-wrong');
+const quizStatPercent = document.querySelector('#quiz-stat-percent');
+const quizSummaryWeak = document.querySelector('#quiz-summary-weak');
+const quizRestartButton = document.querySelector('#quiz-restart-button');
+
+let quizSelectedSubject = '';
+let quizState = null;
+
+function renderQuizSubjectPills() {
+  quizSubjectPillsContainer.innerHTML = Object.keys(SUBJECT_COLORS).map((subject) => {
+    const palette = SUBJECT_COLORS[subject];
+    return `<button type="button" class="subject-pill" data-subject="${subject}" style="--pill-bg:${palette.soft}; --pill-fg:${palette.color}"><span class="dot"></span>${subject}</button>`;
+  }).join('');
+  quizSelectedSubject = Object.keys(SUBJECT_COLORS)[0];
+  updateQuizSubjectPills();
+}
+
+function updateQuizSubjectPills() {
+  quizSubjectPillsContainer.querySelectorAll('.subject-pill').forEach((pill) => {
+    pill.classList.toggle('active', pill.dataset.subject === quizSelectedSubject);
+  });
+}
+
+quizSubjectPillsContainer.addEventListener('click', (event) => {
+  const pill = event.target.closest('.subject-pill');
+  if (!pill) return;
+  quizSelectedSubject = pill.dataset.subject;
+  updateQuizSubjectPills();
+});
+
+function wirePillSelect(container, hiddenInput) {
+  container.addEventListener('click', (event) => {
+    const option = event.target.closest('.quiz-pill-option');
+    if (!option) return;
+    hiddenInput.value = option.dataset.value;
+    [...container.children].forEach((child) => child.classList.toggle('active', child === option));
+  });
+}
+wirePillSelect(quizDifficultySelect, quizDifficultyInput);
+wirePillSelect(quizCountSelect, quizCountInput);
+
+function getQuizHistory() {
+  try { return JSON.parse(localStorage.getItem(quizStorageKey)) || []; } catch { return []; }
+}
+function saveQuizRecord(record) {
+  const history = getQuizHistory();
+  history.unshift(record);
+  localStorage.setItem(quizStorageKey, JSON.stringify(history.slice(0, 300)));
+}
+
+quizSetupForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  if (!quizSetupForm.reportValidity()) return;
+  const mode = quizSetupForm.elements.quizMode.value;
+  const topic = quizTopicInput.value.trim();
+  if (!topic) return;
+
+  quizState = {
+    mode,
+    subject: quizSelectedSubject,
+    topic,
+    difficulty: quizDifficultyInput.value,
+    total: Number(quizCountInput.value),
+    index: 0,
+    correct: 0,
+    wrong: 0,
+    weak: {},
+    current: null,
+  };
+
+  quizSetupForm.hidden = true;
+  quizSummary.hidden = true;
+  quizActive.hidden = false;
+  await loadQuizQuestion();
+});
+
+async function loadQuizQuestion(similarTo) {
+  quizStartButton.disabled = true;
+  quizAlternativesEl.innerHTML = '<p class="quiz-loading">Gerando questão...</p>';
+  quizStatementEl.textContent = '';
+  quizFeedback.hidden = true;
+  quizActions.hidden = true;
+  quizHintText.hidden = true;
+  quizHintButton.hidden = false;
+  quizSkillEl.hidden = true;
+
+  try {
+    const response = await fetch('/api/question', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: quizState.mode,
+        subject: quizState.subject,
+        topic: quizState.topic,
+        difficulty: quizState.difficulty,
+        similarTo: similarTo || undefined,
+      }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Não foi possível gerar a questão agora.');
+
+    quizState.current = data;
+    renderQuizQuestion(data);
+  } catch (error) {
+    quizAlternativesEl.innerHTML = `<p class="quiz-loading">${escapeHtml(error.message || 'Erro ao gerar questão.')}</p>`;
+  } finally {
+    quizStartButton.disabled = false;
+  }
+}
+
+function renderQuizQuestion(data) {
+  updateQuizProgress();
+  if (data.skill && data.skill.toLowerCase() !== 'não aplicável') {
+    quizSkillEl.textContent = data.skill;
+    quizSkillEl.hidden = false;
+  }
+  quizStatementEl.textContent = data.statement;
+  quizAlternativesEl.innerHTML = data.alternatives.map((alt) => (
+    `<button type="button" class="quiz-alt" data-id="${alt.id}"><span class="quiz-alt-letter">${alt.id}</span><span>${escapeHtml(alt.text)}</span></button>`
+  )).join('');
+}
+
+function updateQuizProgress() {
+  quizProgressLabel.textContent = `Questão ${quizState.index + 1} de ${quizState.total} · ${DIFFICULTY_LABELS[quizState.difficulty]}`;
+  quizProgressFill.style.width = `${((quizState.index) / quizState.total) * 100}%`;
+}
+
+quizHintButton.addEventListener('click', () => {
+  const hint = quizState.current?.hint;
+  quizHintText.textContent = hint || 'Sem dica disponível para esta questão.';
+  quizHintText.hidden = false;
+  quizHintButton.hidden = true;
+});
+
+quizAlternativesEl.addEventListener('click', (event) => {
+  const button = event.target.closest('.quiz-alt');
+  if (!button || quizAlternativesEl.dataset.answered === 'true') return;
+  quizAlternativesEl.dataset.answered = 'true';
+  answerQuizQuestion(button.dataset.id);
+});
+
+function answerQuizQuestion(chosenId) {
+  const data = quizState.current;
+  const isCorrect = chosenId === data.correctId;
+
+  [...quizAlternativesEl.children].forEach((btn) => {
+    btn.disabled = true;
+    if (btn.dataset.id === data.correctId) btn.classList.add('quiz-alt-correct');
+    else if (btn.dataset.id === chosenId) btn.classList.add('quiz-alt-wrong');
+  });
+
+  if (isCorrect) {
+    quizState.correct += 1;
+  } else {
+    quizState.wrong += 1;
+    const key = `${quizState.subject} · ${quizState.topic}`;
+    quizState.weak[key] = (quizState.weak[key] || 0) + 1;
+  }
+
+  saveQuizRecord({
+    mode: quizState.mode,
+    subject: quizState.subject,
+    topic: quizState.topic,
+    difficulty: quizState.difficulty,
+    correct: isCorrect,
+    date: new Date().toISOString(),
+  });
+
+  quizFeedbackTitle.textContent = isCorrect ? '✓ Você acertou!' : '✗ Você errou.';
+  quizFeedbackTitle.className = `quiz-feedback-title ${isCorrect ? 'quiz-feedback-correct' : 'quiz-feedback-wrong'}`;
+
+  const wrongList = Object.entries(data.wrongExplanations || {})
+    .filter(([id]) => id !== data.correctId)
+    .map(([id, text]) => `<li><strong>${id})</strong> ${escapeHtml(text)}</li>`)
+    .join('');
+
+  quizFeedbackBody.innerHTML = `
+    <p><strong>Explicação:</strong> ${escapeHtml(data.correctExplanation)}</p>
+    ${wrongList ? `<p><strong>Por que as outras estão erradas:</strong></p><ul>${wrongList}</ul>` : ''}
+    ${data.commonMistake ? `<p><strong>Erro comum:</strong> ${escapeHtml(data.commonMistake)}</p>` : ''}
+  `;
+  quizFeedback.hidden = false;
+  quizHintButton.hidden = true;
+  quizHintText.hidden = true;
+
+  quizActions.hidden = false;
+  quizSimilarButton.hidden = isCorrect;
+  quizNextButton.hidden = quizState.index + 1 >= quizState.total;
+
+  if (isCorrect) {
+    const currentLevel = DIFFICULTY_ORDER.indexOf(quizState.difficulty);
+    quizState.difficulty = DIFFICULTY_ORDER[Math.min(currentLevel + 1, DIFFICULTY_ORDER.length - 1)];
+  } else {
+    const currentLevel = DIFFICULTY_ORDER.indexOf(quizState.difficulty);
+    quizState.difficulty = DIFFICULTY_ORDER[Math.max(currentLevel - 1, 0)];
+  }
+
+  if (quizState.index + 1 >= quizState.total) {
+    quizNextButton.hidden = true;
+  }
+}
+
+quizSimilarButton.addEventListener('click', async () => {
+  quizAlternativesEl.dataset.answered = 'false';
+  await loadQuizQuestion(quizState.current?.statement);
+});
+
+quizNextButton.addEventListener('click', async () => {
+  quizState.index += 1;
+  quizAlternativesEl.dataset.answered = 'false';
+  await loadQuizQuestion();
+});
+
+quizFinishButton.addEventListener('click', finishQuiz);
+
+function finishQuiz() {
+  quizActive.hidden = true;
+  quizSummary.hidden = false;
+
+  const total = quizState.correct + quizState.wrong;
+  const percent = total > 0 ? Math.round((quizState.correct / total) * 100) : 0;
+  quizStatCorrect.textContent = quizState.correct;
+  quizStatWrong.textContent = quizState.wrong;
+  quizStatPercent.textContent = `${percent}%`;
+
+  const weakEntries = Object.entries(quizState.weak).sort((a, b) => b[1] - a[1]);
+  if (weakEntries.length === 0) {
+    quizSummaryWeak.innerHTML = '<p class="quiz-summary-note">Mandou bem em tudo que apareceu — sem pontos de dificuldade registrados.</p>';
+  } else {
+    const items = weakEntries.map(([key, count]) => `<li>${escapeHtml(key)} <span>(${count} erro${count > 1 ? 's' : ''})</span></li>`).join('');
+    quizSummaryWeak.innerHTML = `<p class="quiz-summary-note">Vale revisar:</p><ul class="quiz-summary-list">${items}</ul>`;
+  }
+}
+
+quizRestartButton.addEventListener('click', () => {
+  quizSummary.hidden = true;
+  quizSetupForm.hidden = false;
+  quizState = null;
+});
+
+renderQuizSubjectPills();

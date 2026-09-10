@@ -99,6 +99,12 @@
             </div>
             <div><strong>Estude com apoio visual</strong><span>Imagens reais e exercícios pra praticar</span></div>
           </div>
+          <a class="step-card step-card-link" href="#simulados">
+            <div class="step-icon" style="--step-color:#7c3aed; --step-bg:#f1ecfd">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M9 12.5 11 15l4.5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/></svg>
+            </div>
+            <div><strong>Questões e simulados</strong><span>Treine pro ENEM, vestibular ou prova escolar</span></div>
+          </a>
         </section>
 
         <section class="study-card" aria-labelledby="form-title" id="pesquisa">
@@ -167,6 +173,100 @@
             <button id="exercises-close" class="icon-button" type="button" aria-label="Fechar exercícios">×</button>
           </header>
           <div id="exercises-list" class="exercises-list"></div>
+        </section>
+
+        <section class="quiz-card" id="simulados" aria-labelledby="quiz-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Questões e simulados</p>
+              <h2 id="quiz-heading">Treine com questões originais geradas por IA</h2>
+            </div>
+          </div>
+          <p class="quiz-disclaimer">As questões são criadas pela IA, inspiradas no estilo de provas reais — não são questões oficiais do ENEM ou de vestibulares específicos.</p>
+
+          <form id="quiz-setup-form">
+            <fieldset>
+              <legend>Modo de preparação</legend>
+              <div class="quiz-mode-grid" id="quiz-mode-grid">
+                <label class="quiz-mode-option"><input type="radio" name="quizMode" value="enem" checked /><span>ENEM</span></label>
+                <label class="quiz-mode-option"><input type="radio" name="quizMode" value="vestibular" /><span>Vestibular</span></label>
+                <label class="quiz-mode-option"><input type="radio" name="quizMode" value="escolar" /><span>Prova escolar</span></label>
+                <label class="quiz-mode-option"><input type="radio" name="quizMode" value="revisao" /><span>Revisão geral</span></label>
+              </div>
+            </fieldset>
+
+            <div class="quiz-field-row">
+              <label class="question-label" for="quiz-subject">Matéria ou área</label>
+              <div class="quiz-subject-pills" id="quiz-subject-pills"></div>
+            </div>
+
+            <label class="question-label" for="quiz-topic">Assunto <span aria-hidden="true">*</span></label>
+            <input id="quiz-topic" name="quizTopic" type="text" required placeholder="Ex.: funções do 2º grau, revolução industrial..." />
+
+            <div class="quiz-field-row quiz-field-row-inline">
+              <div>
+                <label class="question-label" for="quiz-difficulty">Dificuldade inicial</label>
+                <div class="quiz-pill-select" id="quiz-difficulty-select">
+                  <button type="button" class="quiz-pill-option" data-value="facil">Fácil</button>
+                  <button type="button" class="quiz-pill-option active" data-value="medio">Médio</button>
+                  <button type="button" class="quiz-pill-option" data-value="dificil">Difícil</button>
+                </div>
+                <input type="hidden" id="quiz-difficulty" value="medio" />
+              </div>
+              <div>
+                <label class="question-label" for="quiz-count">Quantidade de questões</label>
+                <div class="quiz-pill-select" id="quiz-count-select">
+                  <button type="button" class="quiz-pill-option" data-value="3">3</button>
+                  <button type="button" class="quiz-pill-option active" data-value="5">5</button>
+                  <button type="button" class="quiz-pill-option" data-value="10">10</button>
+                </div>
+                <input type="hidden" id="quiz-count" value="5" />
+              </div>
+            </div>
+            <p class="input-hint">Quantidade limitada por enquanto para manter o site gratuito.</p>
+
+            <div class="form-footer">
+              <button class="primary-button" type="submit" id="quiz-start-button"><span>Começar</span><span aria-hidden="true">→</span></button>
+            </div>
+          </form>
+
+          <div id="quiz-active" class="quiz-active" hidden>
+            <div class="quiz-progress-row">
+              <span id="quiz-progress-label"></span>
+              <div class="quiz-progress-bar"><div id="quiz-progress-fill" class="quiz-progress-fill"></div></div>
+            </div>
+            <p class="quiz-ai-tag">✦ Questão gerada por IA — não é uma questão oficial</p>
+            <p id="quiz-skill" class="quiz-skill" hidden></p>
+            <p id="quiz-statement" class="quiz-statement"></p>
+            <div id="quiz-alternatives" class="quiz-alternatives"></div>
+
+            <button type="button" id="quiz-hint-button" class="secondary-button quiz-hint-button">Ver dica</button>
+            <p id="quiz-hint-text" class="quiz-hint-text" hidden></p>
+
+            <div id="quiz-feedback" class="quiz-feedback" hidden>
+              <p id="quiz-feedback-title" class="quiz-feedback-title"></p>
+              <div id="quiz-feedback-body" class="quiz-feedback-body"></div>
+            </div>
+
+            <div class="quiz-actions" id="quiz-actions" hidden>
+              <button type="button" id="quiz-similar-button" class="secondary-button" hidden>Questão parecida</button>
+              <button type="button" id="quiz-next-button" class="primary-button" hidden><span>Próxima questão</span><span aria-hidden="true">→</span></button>
+              <button type="button" id="quiz-finish-button" class="secondary-button">Encerrar simulado</button>
+            </div>
+          </div>
+
+          <div id="quiz-summary" class="quiz-summary" hidden>
+            <h3>Resultado do simulado</h3>
+            <div class="quiz-summary-stats">
+              <div class="quiz-stat"><strong id="quiz-stat-correct">0</strong><span>Acertos</span></div>
+              <div class="quiz-stat"><strong id="quiz-stat-wrong">0</strong><span>Erros</span></div>
+              <div class="quiz-stat"><strong id="quiz-stat-percent">0%</strong><span>Aproveitamento</span></div>
+            </div>
+            <div id="quiz-summary-weak" class="quiz-summary-weak"></div>
+            <div class="form-footer">
+              <button type="button" id="quiz-restart-button" class="primary-button"><span>Fazer novo simulado</span></button>
+            </div>
+          </div>
         </section>
       </section>
     </main>
