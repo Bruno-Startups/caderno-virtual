@@ -598,7 +598,7 @@ function renderQuizHistorySummary() {
         <div class="quiz-history-card-top">
           <div>
             <p class="quiz-history-subject">${escapeHtml(subject)}</p>
-            <p class="quiz-history-meta">${total} questão${total > 1 ? 'ões' : ''} · ${escapeHtml(modesLabel)}</p>
+            <p class="quiz-history-meta">${total} ${total > 1 ? 'questões' : 'questão'} · ${escapeHtml(modesLabel)}</p>
           </div>
           <div class="quiz-history-percent">
             <strong style="color:${palette.color}">${percent}%</strong>
@@ -644,6 +644,7 @@ quizSetupForm.addEventListener('submit', async (event) => {
 
 async function loadQuizQuestion(similarTo) {
   quizStartButton.disabled = true;
+  quizAlternativesEl.dataset.answered = 'false';
   quizAlternativesEl.innerHTML = '<p class="quiz-loading">Gerando questão...</p>';
   quizStatementEl.textContent = '';
   quizFeedback.hidden = true;
