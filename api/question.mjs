@@ -145,10 +145,18 @@ async function callGroq(system, user) {
     }),
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error?.message || 'Falha ao consultar a IA.');
+  if (!response.ok) {
+    const error = new Error(data.error?.message || 'Falha ao consultar a IA.');
+    if (response.status === 429) error.isRateLimit = true;
+    throw error;
+  }
   const raw = data.choices?.[0]?.message?.content?.trim();
   if (!raw) throw new Error('A IA não retornou conteúdo.');
   return raw;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export default async function handler(req, res) {
@@ -168,9 +176,15 @@ export default async function handler(req, res) {
         parsed = parseQuestion(raw, subject, topic);
       } catch (attemptError) {
         lastError = attemptError;
+        if (attemptError.isRateLimit && attempt < 2) await sleep(2000);
       }
     }
-    if (!parsed) throw new Error(lastError?.message || 'Não foi possível gerar uma questão válida agora. Tente novamente.');
+    if (!parsed) {
+      const message = lastError?.isRateLimit
+        ? 'A IA está com muita gente usando agora (limite gratuito). Tenta de novo em alguns segundos.'
+        : (lastError?.message || 'Não foi possível gerar uma questão válida agora. Tente novamente.');
+      throw new Error(message);
+    }
 
     return res.status(200).json({
       mode: mode || 'revisao',
