@@ -140,7 +140,7 @@ async function callGroq(system, user) {
     body: JSON.stringify({
       model: 'openai/gpt-oss-120b',
       messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
-      max_tokens: 1200,
+      max_tokens: 2000,
       temperature: 0.4,
     }),
   });
@@ -176,7 +176,7 @@ export default async function handler(req, res) {
         parsed = parseQuestion(raw, subject, topic);
       } catch (attemptError) {
         lastError = attemptError;
-        if (attemptError.isRateLimit && attempt < 2) await sleep(2000);
+        if (attempt < 2) await sleep(attemptError.isRateLimit ? 2000 : 800);
       }
     }
     if (!parsed) {
