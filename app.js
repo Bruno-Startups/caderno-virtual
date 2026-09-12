@@ -655,7 +655,9 @@ quizSetupForm.addEventListener('submit', async (event) => {
   quizState = {
     mode,
     subject: quizSelectedSubject,
-    topic,
+    requestTopic: topic,
+    currentTopic: topic,
+    usedTopics: topic ? [topic] : [],
     difficulty: quizDifficultyInput.value,
     total: Number(quizCountInput.value),
     index: 0,
@@ -692,7 +694,8 @@ async function loadQuizQuestion(similarTo) {
       body: JSON.stringify({
         mode: quizState.mode,
         subject: quizState.subject,
-        topic: quizState.topic,
+        topic: quizState.requestTopic,
+        avoidTopics: quizState.usedTopics,
         difficulty: quizState.difficulty,
         similarTo: similarTo || undefined,
       }),
@@ -715,7 +718,8 @@ async function loadQuizQuestion(similarTo) {
 
 function renderQuizQuestion(data) {
   quizState.subject = data.subject;
-  quizState.topic = data.topic;
+  quizState.currentTopic = data.topic;
+  if (data.topic && !quizState.usedTopics.includes(data.topic)) quizState.usedTopics.push(data.topic);
   updateQuizProgress();
   quizSubjectTopicEl.textContent = `${data.subject} · ${data.topic}`;
   if (data.skill && data.skill.toLowerCase() !== 'não aplicável') {
@@ -761,14 +765,14 @@ function answerQuizQuestion(chosenId) {
     quizState.correct += 1;
   } else {
     quizState.wrong += 1;
-    const key = `${quizState.subject} · ${quizState.topic}`;
+    const key = `${quizState.subject} · ${quizState.currentTopic}`;
     quizState.weak[key] = (quizState.weak[key] || 0) + 1;
   }
 
   saveQuizRecord({
     mode: quizState.mode,
     subject: quizState.subject,
-    topic: quizState.topic,
+    topic: quizState.currentTopic,
     difficulty: quizState.difficulty,
     correct: isCorrect,
     date: new Date().toISOString(),
