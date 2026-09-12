@@ -90,20 +90,29 @@ function parseQuestion(raw, fallbackSubject, fallbackTopic) {
   const assuntoMatch = raw.match(/ASSUNTO:\s*(.+?)\s*\n/i);
   const habilidadeMatch = raw.match(/HABILIDADE:\s*(.+?)\s*\n/i);
   const enunciadoMatch = raw.match(/ENUNCIADO:\s*\n([\s\S]*?)\n\s*A\)/i);
-  const altABlock = raw.match(/A\)\s*([\s\S]*?)\nB\)\s*([\s\S]*?)\nC\)\s*([\s\S]*?)\nD\)\s*([\s\S]*?)\nE\)\s*([\s\S]*?)\n\s*GABARITO:/i);
-  const gabaritoMatch = raw.match(/GABARITO:\s*([A-E])/i);
-  const explCorretaMatch = raw.match(/EXPLICACAO_CORRETA:\s*\n([\s\S]*?)\n\s*EXPLICACAO_ERRADAS:/i);
-  const explErradasMatch = raw.match(/EXPLICACAO_ERRADAS:\s*\n([\s\S]*?)\n\s*ERRO_COMUM:/i);
-  const erroComumMatch = raw.match(/ERRO_COMUM:\s*(.+?)\s*\n/i);
-  const dicaMatch = raw.match(/DICA:\s*([\s\S]*)$/i);
+  if (!enunciadoMatch) return null;
 
-  if (!enunciadoMatch || !altABlock || !gabaritoMatch || !explCorretaMatch) return null;
+  const afterEnunciado = raw.slice(enunciadoMatch.index + enunciadoMatch[0].length - 2);
+
+  const altABlock = afterEnunciado.match(/A\)\s*([\s\S]*?)\nB\)\s*([\s\S]*?)\nC\)\s*([\s\S]*?)\nD\)\s*([\s\S]*?)\nE\)\s*([\s\S]*?)\n\s*GABARITO:/i);
+  const gabaritoMatch = afterEnunciado.match(/GABARITO:\s*([A-E])/i);
+  const explCorretaMatch = afterEnunciado.match(/EXPLICACAO_CORRETA:\s*\n([\s\S]*?)\n\s*EXPLICACAO_ERRADAS:/i);
+  const explErradasMatch = afterEnunciado.match(/EXPLICACAO_ERRADAS:\s*\n([\s\S]*?)\n\s*ERRO_COMUM:/i);
+  const erroComumMatch = afterEnunciado.match(/ERRO_COMUM:\s*(.+?)\s*\n/i);
+  const dicaMatch = afterEnunciado.match(/DICA:\s*([\s\S]*)$/i);
+
+  if (!altABlock || !gabaritoMatch || !explCorretaMatch) return null;
 
   const letters = ['A', 'B', 'C', 'D', 'E'];
   const alternatives = letters.map((letter, index) => ({
     id: letter,
     text: sanitizeMath(altABlock[index + 1].trim()),
   }));
+
+  const looksMalformed = alternatives.some((alt) =>
+    alt.text.length > 220 || /HABILIDADE:|ENUNCIADO:|MATERIA:|ASSUNTO:/i.test(alt.text)
+  );
+  if (looksMalformed) return null;
 
   const correctId = gabaritoMatch[1].toUpperCase();
   if (!letters.includes(correctId)) return null;
