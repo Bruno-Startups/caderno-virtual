@@ -33,7 +33,7 @@ function sanitizeMath(text) {
     .replace(/[ \t]{2,}/g, ' ');
 }
 
-function buildPrompt({ mode, subject, topic, schoolYear, difficulty, institution, similarTo, avoidTopics }) {
+function buildPrompt({ mode, subject, topic, schoolYear, difficulty, institution, similarTo, avoidTopics, avoidStatements }) {
   const modeText = MODE_GUIDANCE[mode] || MODE_GUIDANCE.revisao;
   const difficultyText = DIFFICULTY_LABELS[difficulty] || 'médio';
 
@@ -86,6 +86,10 @@ DICA: <uma dica curta que ajuda sem entregar a resposta>`;
   if (institution) user += `\nEstilo de referência (aproximado, não oficial): ${institution}`;
   if (!topic && Array.isArray(avoidTopics) && avoidTopics.length > 0) {
     user += `\n\nJá foram usados nesta sessão os seguintes assuntos, dentro da mesma matéria: ${avoidTopics.join(', ')}. Escolha um assunto DIFERENTE desses, ainda dentro da matéria informada, para variar o simulado.`;
+  }
+  if (Array.isArray(avoidStatements) && avoidStatements.length > 0) {
+    const shortened = avoidStatements.slice(-15).map((text) => text.length > 160 ? `${text.slice(0, 157)}...` : text);
+    user += `\n\nEstas questões já foram usadas antes para este aluno nesta matéria — NÃO repita nenhuma delas nem crie uma questão muito parecida (mesmo contexto/números), mesmo que o assunto seja o mesmo:\n- ${shortened.join('\n- ')}`;
   }
   if (similarTo) user += `\n\nO aluno errou uma questão parecida com esta anteriormente: "${similarTo}". Crie uma NOVA questão sobre o mesmo assunto e mesma dificuldade, com contexto e números diferentes, para reforçar o mesmo conceito.`;
 
@@ -179,10 +183,10 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido.' });
   if (!process.env.GROQ_API_KEY) return res.status(503).json({ error: 'A chave da IA ainda não foi configurada.' });
   try {
-    const { mode, subject, topic, schoolYear, difficulty, institution, similarTo, avoidTopics } = req.body || {};
+    const { mode, subject, topic, schoolYear, difficulty, institution, similarTo, avoidTopics, avoidStatements } = req.body || {};
     if (!subject && !topic) return res.status(400).json({ error: 'Escolha uma matéria ou digite um assunto.' });
 
-    const { system, user } = buildPrompt({ mode, subject, topic, schoolYear, difficulty, institution, similarTo, avoidTopics });
+    const { system, user } = buildPrompt({ mode, subject, topic, schoolYear, difficulty, institution, similarTo, avoidTopics, avoidStatements });
 
     let parsed = null;
     let lastError = null;
