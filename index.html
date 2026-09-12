@@ -132,41 +132,44 @@
             <div><p id="answer-meta" class="eyebrow">Seu conteúdo</p><h2 id="answer-title">Vamos estudar isso</h2></div>
           </header>
 
-          <div class="answer-content">
-            <section class="summary-block">
-              <h3>Resumo rápido</h3>
-              <ul id="summary-list"></ul>
-            </section>
-            <section class="mindmap-block">
-              <h3>Mapa mental</h3>
-              <div id="mindmap-container"></div>
-            </section>
-            <section class="explanation-block">
-              <h3>Explicação completa</h3>
-              <div id="explanation-content"></div>
-            </section>
-            <section class="images-block">
-              <h3>Saiba mais</h3>
-              <div id="images-grid" class="images-grid"></div>
-              <p id="images-empty" class="images-empty" hidden>Não encontramos um artigo relacionado a este assunto.</p>
-            </section>
+          <div class="hub-tabs" role="tablist">
+            <button type="button" class="hub-tab active" data-tab="study" role="tab" aria-selected="true">Estudo</button>
+            <button type="button" class="hub-tab" data-tab="exercises" role="tab" aria-selected="false">Exercícios</button>
+          </div>
+
+          <div class="hub-panes">
+            <div class="hub-pane active" data-pane="study">
+              <div class="answer-content">
+                <section class="summary-block">
+                  <h3>Resumo rápido</h3>
+                  <ul id="summary-list"></ul>
+                </section>
+                <section class="mindmap-block">
+                  <h3>Mapa mental</h3>
+                  <div id="mindmap-container"></div>
+                </section>
+                <section class="explanation-block">
+                  <h3>Explicação completa</h3>
+                  <div id="explanation-content"></div>
+                </section>
+                <section class="images-block">
+                  <h3>Saiba mais</h3>
+                  <div id="images-grid" class="images-grid"></div>
+                  <p id="images-empty" class="images-empty" hidden>Não encontramos um artigo relacionado a este assunto.</p>
+                </section>
+              </div>
+            </div>
+            <div class="hub-pane" data-pane="exercises">
+              <div id="exercises-list" class="exercises-list"></div>
+            </div>
           </div>
 
           <footer class="answer-footer">
             <p>Confira o conteúdo e adapte-o com suas próprias palavras.</p>
             <div class="answer-footer-actions">
-              <button id="generate-exercises" class="secondary-button" type="button">Gerar exercícios</button>
               <button id="new-question" class="secondary-button" type="button">Pesquisar outro assunto</button>
             </div>
           </footer>
-        </section>
-
-        <section id="exercises" class="exercises-card" aria-live="polite" hidden>
-          <header class="exercises-header">
-            <h2>Exercícios para praticar</h2>
-            <button id="exercises-close" class="icon-button" type="button" aria-label="Fechar exercícios">×</button>
-          </header>
-          <div id="exercises-list" class="exercises-list"></div>
         </section>
 
         <section class="quiz-card" id="simulados" aria-labelledby="quiz-heading">

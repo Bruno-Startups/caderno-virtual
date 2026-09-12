@@ -91,10 +91,6 @@ button, textarea, select { font:inherit; } button { cursor:pointer; } .skip-link
 .wiki-card-text span { color:var(--blue); font-size:13px; font-weight:600; }
 .images-empty { margin:0; color:var(--muted); font-size:14px; }
 .answer-footer-actions { display:flex; gap:10px; }
-.exercises-card { margin-top:24px; padding:26px; border:1px solid var(--line); border-radius:18px; background:white; box-shadow:var(--shadow); }
-.exercises-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
-.exercises-header h2 { margin:0; font-family:Georgia,serif; font-size:22px; }
-.exercises-header .icon-button { background:#eef2f7; color:var(--ink); }
 .quiz-history-heading .icon-button { background:#eef2f7; color:var(--ink); }
 .exercises-list { display:grid; gap:12px; }
 .exercise-item { border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
@@ -170,5 +166,17 @@ button, textarea, select { font:inherit; } button { cursor:pointer; } .skip-link
 .quiz-summary-note { margin:0 0 8px; color:var(--muted); font-size:14px; }
 .quiz-summary-list { margin:0; padding-left:20px; color:#243a55; font-size:14px; }
 .quiz-summary-list span { color:var(--muted); font-size:12.5px; }
+
+/* ===== Abas Estudo / Exercícios (hub) ===== */
+.hub-tabs { display:flex; gap:6px; padding:20px 26px 0; background:#f2f6fb; }
+.hub-tab { flex:1; padding:14px 18px; border:2px solid transparent; border-bottom:none; border-radius:12px 12px 0 0; background:transparent; color:#8a97a8; font-size:15px; font-weight:700; transition:background .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease; }
+.hub-tab:hover { color:var(--blue); }
+.hub-tab.active { background:white; color:var(--blue); border-color:var(--blue); box-shadow:0 -3px 10px rgba(31,102,178,.12); position:relative; top:2px; font-weight:800; }
+.hub-panes { position:relative; border-top:2px solid var(--blue); }
+.hub-pane { padding:25px 26px 4px; opacity:0; position:absolute; inset:0; transform:translateY(6px); transition:opacity .22s ease, transform .22s ease; pointer-events:none; }
+.hub-pane.active { position:relative; opacity:1; transform:translateY(0); pointer-events:auto; }
+.hub-pane .answer-content { padding:0; }
+.hub-pane[data-pane="exercises"] { padding:25px 26px; }
+
 @media (max-width:800px) { .page-shell { display:block; }.sidebar { position:static; height:auto; min-height:auto; padding:16px 20px; overflow:visible; }.brand { font-size:16px; }.brand br { display:none; }.history-heading { margin-top:17px; padding-top:14px; }.sidebar-note { display:none; }.history-list { display:grid; overflow:visible; margin-top:12px; max-height:none; }.history-item { flex:initial; width:100%; }.content { padding:35px 18px 50px; }.study-card { padding:23px 18px; } .decor-1 { width:200px; } .decor-2 { width:150px; } .decor-3 { width:130px; } .decor-4 { width:110px; } .decor-dots { width:90px; } }
-@media (max-width:560px) { .hero h1 { font-size:30px; }.hero-copy { font-size:15px; }.quick-start { grid-template-columns:1fr; }.context-grid { grid-template-columns:1fr; }.form-footer,.answer-footer { align-items:stretch; flex-direction:column; }.primary-button,.secondary-button { width:100%; }.answer-header { align-items:flex-start; padding:18px; }.answer-tag { margin-left:0; }.answer-content { padding:22px 18px 4px; }.answer-footer { padding:16px 18px; } .answer-footer-actions { width:100%; } .answer-footer-actions .secondary-button { flex:1; } .wiki-card { flex-direction:column; align-items:stretch; } .wiki-card img { width:100%; height:160px; } .wiki-card-text { padding:12px 14px; } .decor-2, .decor-4 { display:none; } .decor-1 { width:140px; opacity:.05; } .decor-3 { width:100px; } .decor-dots { display:none; } .quiz-card { padding:20px 16px; } .quiz-mode-grid { grid-template-columns:repeat(2,1fr); } .quiz-field-row-inline { grid-template-columns:1fr; gap:16px; } .quiz-summary-stats { grid-template-columns:1fr 1fr; } .quiz-actions { flex-direction:column; } .quiz-actions button { width:100%; } }
+@media (max-width:560px) { .hero h1 { font-size:30px; }.hero-copy { font-size:15px; }.quick-start { grid-template-columns:1fr; }.context-grid { grid-template-columns:1fr; }.form-footer,.answer-footer { align-items:stretch; flex-direction:column; }.primary-button,.secondary-button { width:100%; }.answer-header { align-items:flex-start; padding:18px; }.answer-tag { margin-left:0; }.answer-content { padding:22px 18px 4px; }.answer-footer { padding:16px 18px; } .answer-footer-actions { width:100%; } .answer-footer-actions .secondary-button { flex:1; } .wiki-card { flex-direction:column; align-items:stretch; } .wiki-card img { width:100%; height:160px; } .wiki-card-text { padding:12px 14px; } .decor-2, .decor-4 { display:none; } .decor-1 { width:140px; opacity:.05; } .decor-3 { width:100px; } .decor-dots { display:none; } .quiz-card { padding:20px 16px; } .quiz-mode-grid { grid-template-columns:repeat(2,1fr); } .quiz-field-row-inline { grid-template-columns:1fr; gap:16px; } .quiz-summary-stats { grid-template-columns:1fr 1fr; } .quiz-actions { flex-direction:column; } .quiz-actions button { width:100%; } .hub-tabs { padding:14px 16px 0; } .hub-pane { padding:18px 16px 4px; } .hub-pane[data-pane="exercises"] { padding:18px 16px; } }
