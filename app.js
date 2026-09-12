@@ -34,9 +34,20 @@ function setMainTab(name) {
     tab.setAttribute('aria-selected', isActive);
   });
   mainPanes.forEach((pane) => pane.classList.toggle('active', pane.dataset.mainpane === name));
+  document.body.classList.toggle('maintab-simulados', name === 'simulados');
+  clearHistory.dataset.mode = name;
+  const historyCaption = document.querySelector('#history-caption');
+  if (name === 'simulados') {
+    historyCaption.textContent = 'Seu desempenho nos simulados, salvo neste aparelho.';
+    renderQuizSidebarHistory();
+  } else {
+    historyCaption.textContent = 'Seus assuntos ficam salvos por matéria, neste aparelho.';
+    renderHistory();
+  }
 }
 
 mainTabs.forEach((tab) => tab.addEventListener('click', () => setMainTab(tab.dataset.maintab)));
+clearHistory.dataset.mode = 'estudo';
 
 document.querySelectorAll('[data-maintab-trigger]').forEach((el) => {
   el.addEventListener('click', () => {
@@ -434,7 +445,16 @@ exercisesList.addEventListener('click', (event) => {
 
 exercisesClose.addEventListener('click', () => { exercisesSection.hidden = true; });
 
-clearHistory.addEventListener('click', () => { localStorage.removeItem(storageKey); answer.hidden = true; renderHistory(); });
+clearHistory.addEventListener('click', () => {
+  if (clearHistory.dataset.mode === 'simulados') {
+    localStorage.removeItem(quizStorageKey);
+    renderQuizSidebarHistory();
+  } else {
+    localStorage.removeItem(storageKey);
+    answer.hidden = true;
+    renderHistory();
+  }
+});
 
 newQuestion.addEventListener('click', () => {
   form.reset();
@@ -580,18 +600,14 @@ function saveQuizRecord(record) {
   localStorage.setItem(quizStorageKey, JSON.stringify(history.slice(0, 300)));
 }
 
-const quizHistorySection = document.querySelector('#quiz-history-section');
-const quizHistoryListEl = document.querySelector('#quiz-history-list');
-const quizClearHistoryButton = document.querySelector('#quiz-clear-history');
 const MODE_LABELS = { enem: 'ENEM', vestibular: 'Vestibular', escolar: 'Prova escolar', revisao: 'Revisão geral' };
 
-function renderQuizHistorySummary() {
+function renderQuizSidebarHistory() {
   const records = getQuizHistory();
   if (records.length === 0) {
-    quizHistorySection.hidden = true;
+    historyList.innerHTML = '<p class="empty-history">Faça seu primeiro simulado pra ver seu desempenho aqui.</p>';
     return;
   }
-  quizHistorySection.hidden = false;
 
   const bySubject = {};
   records.forEach((record) => {
@@ -605,37 +621,29 @@ function renderQuizHistorySummary() {
     bucket.modes.add(record.mode);
   });
 
-  quizHistoryListEl.innerHTML = Object.entries(bySubject).map(([subject, stats]) => {
+  historyList.innerHTML = Object.entries(bySubject).map(([subject, stats]) => {
     const palette = SUBJECT_COLORS[subject] || { color: '#5e7da1' };
     const total = stats.correct + stats.wrong;
     const percent = total > 0 ? Math.round((stats.correct / total) * 100) : 0;
     const modesLabel = [...stats.modes].map((mode) => MODE_LABELS[mode] || mode).join(', ');
     const weakEntries = Object.entries(stats.weak).sort((a, b) => b[1] - a[1]);
     const weakNote = weakEntries.length > 0
-      ? `<p class="quiz-history-weak">Vale revisar: ${escapeHtml(weakEntries[0][0])} (${weakEntries[0][1]} erro${weakEntries[0][1] > 1 ? 's' : ''})</p>`
+      ? `<p class="quiz-sidebar-weak">Vale revisar: ${escapeHtml(weakEntries[0][0])}</p>`
       : '';
     return `
-      <div class="quiz-history-card" style="border-left-color:${palette.color}">
-        <div class="quiz-history-card-top">
+      <div class="quiz-sidebar-card" style="--tab-color:${palette.color}">
+        <div class="quiz-sidebar-card-top">
           <div>
-            <p class="quiz-history-subject">${escapeHtml(subject)}</p>
-            <p class="quiz-history-meta">${total} ${total > 1 ? 'questões' : 'questão'} · ${escapeHtml(modesLabel)}</p>
+            <p class="quiz-sidebar-subject">${escapeHtml(subject)}</p>
+            <p class="quiz-sidebar-meta">${total} ${total > 1 ? 'questões' : 'questão'} · ${escapeHtml(modesLabel)}</p>
           </div>
-          <div class="quiz-history-percent">
-            <strong style="color:${palette.color}">${percent}%</strong>
-            <span>${stats.correct} acertos · ${stats.wrong} erros</span>
-          </div>
+          <span class="quiz-sidebar-percent">${percent}%</span>
         </div>
-        <div class="quiz-history-bar"><div style="width:${percent}%; background:${palette.color}"></div></div>
+        <div class="quiz-sidebar-bar"><div style="width:${percent}%; background:${palette.color}"></div></div>
         ${weakNote}
       </div>`;
   }).join('');
 }
-
-quizClearHistoryButton.addEventListener('click', () => {
-  localStorage.removeItem(quizStorageKey);
-  renderQuizHistorySummary();
-});
 
 quizSetupForm.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -834,7 +842,7 @@ function finishQuiz() {
     quizSummaryWeak.innerHTML = `<p class="quiz-summary-note">Vale revisar:</p><ul class="quiz-summary-list">${items}</ul>`;
   }
 
-  renderQuizHistorySummary();
+  renderQuizSidebarHistory();
 }
 
 quizRestartButton.addEventListener('click', () => {
@@ -848,4 +856,3 @@ quizRestartButton.addEventListener('click', () => {
 });
 
 renderQuizSubjectPills();
-renderQuizHistorySummary();

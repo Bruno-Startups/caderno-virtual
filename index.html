@@ -60,7 +60,7 @@
         <div class="history-heading">
           <div>
             <p class="history-title"><span class="history-title-icon" aria-hidden="true">🕘</span> Seu histórico</p>
-            <p class="history-caption">Seus assuntos ficam salvos por matéria, neste aparelho.</p>
+            <p class="history-caption" id="history-caption">Seus assuntos ficam salvos por matéria, neste aparelho.</p>
           </div>
           <button class="icon-button" id="clear-history" type="button" aria-label="Limpar histórico" hidden>×</button>
         </div>
@@ -187,14 +187,6 @@
             </div>
           </div>
           <p class="quiz-disclaimer">As questões são criadas pela IA, inspiradas no estilo de provas reais — não são questões oficiais do ENEM ou de vestibulares específicos.</p>
-
-          <section id="quiz-history-section" class="quiz-history-section" hidden>
-            <div class="quiz-history-heading">
-              <h3>Seu desempenho</h3>
-              <button type="button" id="quiz-clear-history" class="icon-button" aria-label="Limpar histórico de simulados">×</button>
-            </div>
-            <div id="quiz-history-list" class="quiz-history-list"></div>
-          </section>
 
           <form id="quiz-setup-form">
             <fieldset>
