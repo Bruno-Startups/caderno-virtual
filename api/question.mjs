@@ -43,6 +43,10 @@ REGRA MAIS IMPORTANTE: a questão deve ser 100% ORIGINAL, criada por você agora
 
 ${modeText}
 
+IMPORTANTE — escopo: você só cria questões sobre assuntos do currículo escolar do Fundamental e Ensino Médio no Brasil, dentro de uma das matérias listadas acima (conceitos, eventos, fórmulas, fenômenos, obras, gramática etc.). NÃO é assunto escolar: receitas de culinária, entretenimento, celebridades, jogos, produtos, opiniões pessoais, ou qualquer tópico do dia a dia que não seja tradicionalmente ensinado em sala de aula. Se o assunto pedido não for um tema escolar de verdade, responda EXATAMENTE e apenas com esta linha, sem nenhuma outra marcação:
+
+FORA_DE_ESCOPO: <explique em uma frase curta e gentil que esse não é um assunto escolar, e sugira reformular>
+
 FÓRMULAS E CÁLCULOS: escreva em texto simples (√, ², ³, ×, ÷, ±) — nunca em LaTeX ou comandos com barra invertida.
 
 DADOS EM TABELA: se a questão precisar apresentar dados (região, ano, valor, etc.), NUNCA use tabela em Markdown (nunca use o caractere | nem linhas de traços tipo ---). Em vez disso, escreva cada item como uma linha de texto simples, assim: "Norte: 1.560.000 km², 18,5 milhões de habitantes." — um item por linha.
@@ -190,14 +194,23 @@ export default async function handler(req, res) {
 
     let parsed = null;
     let lastError = null;
-    for (let attempt = 0; attempt < 3 && !parsed; attempt += 1) {
+    let outOfScopeMessage = null;
+    for (let attempt = 0; attempt < 3 && !parsed && !outOfScopeMessage; attempt += 1) {
       try {
         const raw = await callGroq(system, user);
+        const outOfScopeMatch = raw.match(/^FORA_DE_ESCOPO:\s*(.+)$/im);
+        if (outOfScopeMatch) {
+          outOfScopeMessage = outOfScopeMatch[1].trim();
+          break;
+        }
         parsed = parseQuestion(raw, subject, topic);
       } catch (attemptError) {
         lastError = attemptError;
         if (attempt < 2) await sleep(attemptError.isRateLimit ? 2000 : 800);
       }
+    }
+    if (outOfScopeMessage) {
+      return res.status(422).json({ error: outOfScopeMessage });
     }
     if (!parsed) {
       const message = lastError?.isRateLimit
