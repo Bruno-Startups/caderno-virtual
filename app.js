@@ -600,6 +600,14 @@ function saveQuizRecord(record) {
   localStorage.setItem(quizStorageKey, JSON.stringify(history.slice(0, 300)));
 }
 
+function getPastQuestionsForSubject(subject) {
+  const records = getQuizHistory();
+  const filtered = subject ? records.filter((record) => record.subject === subject) : records;
+  const topics = [...new Set(filtered.map((record) => record.topic).filter(Boolean))];
+  const statements = [...new Set(filtered.map((record) => record.statement).filter(Boolean))];
+  return { topics, statements };
+}
+
 const MODE_LABELS = { enem: 'ENEM', vestibular: 'Vestibular', escolar: 'Prova escolar', revisao: 'Revisão geral' };
 
 function renderQuizSidebarHistory() {
@@ -658,6 +666,7 @@ quizSetupForm.addEventListener('submit', async (event) => {
     requestTopic: topic,
     currentTopic: topic,
     usedTopics: topic ? [topic] : [],
+    usedStatements: [],
     difficulty: quizDifficultyInput.value,
     total: Number(quizCountInput.value),
     index: 0,
@@ -688,6 +697,10 @@ async function loadQuizQuestion(similarTo) {
   quizSubjectTopicEl.textContent = '';
 
   try {
+    const past = getPastQuestionsForSubject(quizState.subject);
+    const avoidTopics = [...new Set([...quizState.usedTopics, ...past.topics])];
+    const avoidStatements = [...new Set([...quizState.usedStatements, ...past.statements])].slice(-40);
+
     const response = await fetch('/api/question', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -695,7 +708,8 @@ async function loadQuizQuestion(similarTo) {
         mode: quizState.mode,
         subject: quizState.subject,
         topic: quizState.requestTopic,
-        avoidTopics: quizState.usedTopics,
+        avoidTopics,
+        avoidStatements,
         difficulty: quizState.difficulty,
         similarTo: similarTo || undefined,
       }),
@@ -720,6 +734,7 @@ function renderQuizQuestion(data) {
   quizState.subject = data.subject;
   quizState.currentTopic = data.topic;
   if (data.topic && !quizState.usedTopics.includes(data.topic)) quizState.usedTopics.push(data.topic);
+  if (data.statement && !quizState.usedStatements.includes(data.statement)) quizState.usedStatements.push(data.statement);
   updateQuizProgress();
   quizSubjectTopicEl.textContent = `${data.subject} · ${data.topic}`;
   if (data.skill && data.skill.toLowerCase() !== 'não aplicável') {
@@ -773,6 +788,7 @@ function answerQuizQuestion(chosenId) {
     mode: quizState.mode,
     subject: quizState.subject,
     topic: quizState.currentTopic,
+    statement: data.statement,
     difficulty: quizState.difficulty,
     correct: isCorrect,
     date: new Date().toISOString(),
