@@ -142,8 +142,23 @@ form.elements.subject.addEventListener('change', () => {
 const escapeHtml = (value) => value.replace(/[&<>'"]/g, (character) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#039;', '"':'&quot;' })[character]);
 const bold = (text) => escapeHtml(text).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 
+async function parseJsonResponse(response) {
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    throw new Error('O servidor demorou muito ou está instável agora. Tenta de novo em instantes.');
+  }
+  return response.json();
+}
+
 function getHistory() { try { return JSON.parse(localStorage.getItem(storageKey)) || {}; } catch { return {}; } }
-function saveHistory(history) { localStorage.setItem(storageKey, JSON.stringify(history)); renderHistory(); }
+function saveHistory(history) {
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(history));
+  } catch (error) {
+    console.warn('Não foi possível salvar o histórico:', error);
+  }
+  renderHistory();
+}
 
 function normalizeTopic(text) {
   return (text || '')
@@ -377,7 +392,7 @@ form.addEventListener('submit', async (event) => {
       }),
       fetchWikipediaSummary(`${topic} ${subject}`),
     ]);
-    const data = await contentResponse.json();
+    const data = await parseJsonResponse(contentResponse);
     if (!contentResponse.ok) throw new Error(data.error || 'Não foi possível gerar o conteúdo agora.');
 
     const finalSubject = data.subject || subject;
@@ -414,7 +429,7 @@ generateExercisesBtn.addEventListener('click', async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ subject: currentItem.subject, schoolYear: currentItem.schoolYear, topic: currentItem.topic }),
     });
-    const data = await response.json();
+    const data = await parseJsonResponse(response);
     if (!response.ok) throw new Error(data.error || 'Não foi possível gerar exercícios agora.');
 
     exercisesList.innerHTML = data.exercises.map((exercise, index) => `
@@ -483,10 +498,18 @@ function dedupExistingHistory() {
   if (changed) localStorage.setItem(storageKey, JSON.stringify(history));
 }
 
-renderHeroSubjects();
-renderTopicChips('');
-dedupExistingHistory();
-renderHistory();
+function safeRun(label, fn) {
+  try {
+    fn();
+  } catch (error) {
+    console.error(`Falha ao inicializar "${label}":`, error);
+  }
+}
+
+safeRun('hero-subjects', renderHeroSubjects);
+safeRun('topic-chips', () => renderTopicChips(''));
+safeRun('dedup-history', dedupExistingHistory);
+safeRun('render-history', renderHistory);
 
 /* ===== Questões e Simulados ===== */
 
@@ -597,7 +620,11 @@ function getQuizHistory() {
 function saveQuizRecord(record) {
   const history = getQuizHistory();
   history.unshift(record);
-  localStorage.setItem(quizStorageKey, JSON.stringify(history.slice(0, 300)));
+  try {
+    localStorage.setItem(quizStorageKey, JSON.stringify(history.slice(0, 300)));
+  } catch (error) {
+    console.warn('Não foi possível salvar o histórico de simulados:', error);
+  }
 }
 
 function getPastQuestionsForSubject(subject) {
@@ -714,7 +741,7 @@ async function loadQuizQuestion(similarTo) {
         similarTo: similarTo || undefined,
       }),
     });
-    const data = await response.json();
+    const data = await parseJsonResponse(response);
     if (!response.ok) throw new Error(data.error || 'Não foi possível gerar a questão agora.');
 
     quizState.current = data;
@@ -875,4 +902,4 @@ quizRestartButton.addEventListener('click', () => {
   quizState = null;
 });
 
-renderQuizSubjectPills();
+safeRun('quiz-subject-pills', renderQuizSubjectPills);
