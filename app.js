@@ -19,10 +19,31 @@ const imagesEmpty = document.querySelector('#images-empty');
 const historyList = document.querySelector('#history-list');
 const clearHistory = document.querySelector('#clear-history');
 const newQuestion = document.querySelector('#new-question');
+const generateExercisesBtn = document.querySelector('#generate-exercises');
+const exercisesSection = document.querySelector('#exercises');
 const exercisesList = document.querySelector('#exercises-list');
-const hubTabs = document.querySelectorAll('.hub-tab');
-const hubPanes = document.querySelectorAll('.hub-pane');
-let exercisesLoadedForTopic = null;
+const exercisesClose = document.querySelector('#exercises-close');
+
+const mainTabs = document.querySelectorAll('.main-tab');
+const mainPanes = document.querySelectorAll('.main-tab-pane');
+
+function setMainTab(name) {
+  mainTabs.forEach((tab) => {
+    const isActive = tab.dataset.maintab === name;
+    tab.classList.toggle('active', isActive);
+    tab.setAttribute('aria-selected', isActive);
+  });
+  mainPanes.forEach((pane) => pane.classList.toggle('active', pane.dataset.mainpane === name));
+}
+
+mainTabs.forEach((tab) => tab.addEventListener('click', () => setMainTab(tab.dataset.maintab)));
+
+document.querySelectorAll('[data-maintab-trigger]').forEach((el) => {
+  el.addEventListener('click', () => {
+    setMainTab(el.dataset.maintabTrigger);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
 
 const storageKey = 'caderno-virtual-history-v4';
 let currentItem = null;
@@ -309,51 +330,8 @@ function renderMindMap(topic, keywords, color, softColor) {
   `;
 }
 
-function setHubTab(tabName) {
-  hubTabs.forEach((tab) => {
-    const isActive = tab.dataset.tab === tabName;
-    tab.classList.toggle('active', isActive);
-    tab.setAttribute('aria-selected', isActive);
-  });
-  hubPanes.forEach((pane) => pane.classList.toggle('active', pane.dataset.pane === tabName));
-}
-
-async function loadExercisesIfNeeded() {
-  if (!currentItem) return;
-  const topicKey = `${currentItem.subject}::${currentItem.topic}`;
-  if (exercisesLoadedForTopic === topicKey) return;
-  exercisesList.innerHTML = '<p class="quiz-loading">Gerando exercícios...</p>';
-  try {
-    const response = await fetch('/api/exercises', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ subject: currentItem.subject, schoolYear: currentItem.schoolYear, topic: currentItem.topic }),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Não foi possível gerar exercícios agora.');
-    exercisesList.innerHTML = data.exercises.map((exercise, index) => `
-      <div class="exercise-item">
-        <p class="exercise-question">${index + 1}. ${bold(exercise.question)}</p>
-        <button class="exercise-toggle" type="button" data-index="${index}">Ver resposta</button>
-        <div class="exercise-answer" id="exercise-answer-${index}">${bold(exercise.answer)}</div>
-      </div>
-    `).join('');
-    exercisesLoadedForTopic = topicKey;
-  } catch (error) {
-    exercisesList.innerHTML = `<p>${escapeHtml(error.message || 'Não foi possível gerar exercícios agora.')}</p>`;
-  }
-}
-
-hubTabs.forEach((tab) => {
-  tab.addEventListener('click', async () => {
-    setHubTab(tab.dataset.tab);
-    if (tab.dataset.tab === 'exercises') await loadExercisesIfNeeded();
-  });
-});
-
 function showAnswer(item, shouldScroll = true) {
   currentItem = item;
-  exercisesLoadedForTopic = null;
   answerTitle.textContent = item.topic;
   answerMeta.textContent = item.schoolYear ? `${item.subject} · ${item.schoolYear}` : item.subject;
   summaryList.innerHTML = item.summary.map((line) => `<li>${bold(line)}</li>`).join('');
@@ -361,7 +339,7 @@ function showAnswer(item, shouldScroll = true) {
   renderMindMap(item.topic, item.keywords, palette.color, palette.soft);
   explanationContent.innerHTML = renderExplanation(item.explanation);
   renderWikipediaCard(item.images);
-  setHubTab('study');
+  exercisesSection.hidden = true;
   answer.hidden = false;
   if (shouldScroll) answer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -415,6 +393,37 @@ form.addEventListener('submit', async (event) => {
   }
 });
 
+generateExercisesBtn.addEventListener('click', async () => {
+  if (!currentItem) return;
+  generateExercisesBtn.disabled = true;
+  generateExercisesBtn.textContent = 'Gerando...';
+  try {
+    const response = await fetch('/api/exercises', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subject: currentItem.subject, schoolYear: currentItem.schoolYear, topic: currentItem.topic }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Não foi possível gerar exercícios agora.');
+
+    exercisesList.innerHTML = data.exercises.map((exercise, index) => `
+      <div class="exercise-item">
+        <p class="exercise-question">${index + 1}. ${bold(exercise.question)}</p>
+        <button class="exercise-toggle" type="button" data-index="${index}">Ver resposta</button>
+        <div class="exercise-answer" id="exercise-answer-${index}">${bold(exercise.answer)}</div>
+      </div>
+    `).join('');
+    exercisesSection.hidden = false;
+    exercisesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (error) {
+    exercisesList.innerHTML = `<p>${escapeHtml(error.message || 'Não foi possível gerar exercícios agora.')}</p>`;
+    exercisesSection.hidden = false;
+  } finally {
+    generateExercisesBtn.disabled = false;
+    generateExercisesBtn.textContent = 'Gerar exercícios';
+  }
+});
+
 exercisesList.addEventListener('click', (event) => {
   const button = event.target.closest('.exercise-toggle');
   if (!button) return;
@@ -422,6 +431,8 @@ exercisesList.addEventListener('click', (event) => {
   target.classList.toggle('visible');
   button.textContent = target.classList.contains('visible') ? 'Esconder resposta' : 'Ver resposta';
 });
+
+exercisesClose.addEventListener('click', () => { exercisesSection.hidden = true; });
 
 clearHistory.addEventListener('click', () => { localStorage.removeItem(storageKey); answer.hidden = true; renderHistory(); });
 
@@ -431,6 +442,7 @@ newQuestion.addEventListener('click', () => {
   updateActivePill();
   renderTopicChips('');
   answer.hidden = true;
+  exercisesSection.hidden = true;
   topicInput.focus();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });

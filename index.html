@@ -80,6 +80,13 @@
           <div class="hero-subjects" aria-hidden="true" id="hero-subjects"></div>
         </header>
 
+        <div class="main-tabs" role="tablist">
+          <button type="button" class="main-tab active" data-maintab="estudo" role="tab" aria-selected="true">Estudar</button>
+          <button type="button" class="main-tab" data-maintab="simulados" role="tab" aria-selected="false">Questões e simulados</button>
+        </div>
+
+        <div class="main-tab-pane active" data-mainpane="estudo">
+
         <section class="quick-start" aria-label="Como funciona">
           <div class="step-card">
             <div class="step-icon" style="--step-color:#0f9b8e; --step-bg:#e4f8f5">
@@ -93,12 +100,12 @@
             </div>
             <div><strong>Estude com apoio visual</strong><span>Imagens reais e exercícios pra praticar</span></div>
           </div>
-          <a class="step-card step-card-link" href="#simulados">
+          <button type="button" class="step-card step-card-link" data-maintab-trigger="simulados">
             <div class="step-icon" style="--step-color:#7c3aed; --step-bg:#f1ecfd">
               <svg viewBox="0 0 24 24" fill="none"><path d="M9 12.5 11 15l4.5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/></svg>
             </div>
             <div><strong>Questões e simulados</strong><span>Treine pro ENEM, vestibular ou prova escolar</span></div>
-          </a>
+          </button>
         </section>
 
         <section class="study-card" aria-labelledby="form-title" id="pesquisa">
@@ -132,46 +139,46 @@
             <div><p id="answer-meta" class="eyebrow">Seu conteúdo</p><h2 id="answer-title">Vamos estudar isso</h2></div>
           </header>
 
-          <div class="hub-tabs" role="tablist">
-            <button type="button" class="hub-tab active" data-tab="study" role="tab" aria-selected="true">Estudo</button>
-            <button type="button" class="hub-tab" data-tab="exercises" role="tab" aria-selected="false">Exercícios</button>
-          </div>
-
-          <div class="hub-panes">
-            <div class="hub-pane active" data-pane="study">
-              <div class="answer-content">
-                <section class="summary-block">
-                  <h3>Resumo rápido</h3>
-                  <ul id="summary-list"></ul>
-                </section>
-                <section class="mindmap-block">
-                  <h3>Mapa mental</h3>
-                  <div id="mindmap-container"></div>
-                </section>
-                <section class="explanation-block">
-                  <h3>Explicação completa</h3>
-                  <div id="explanation-content"></div>
-                </section>
-                <section class="images-block">
-                  <h3>Saiba mais</h3>
-                  <div id="images-grid" class="images-grid"></div>
-                  <p id="images-empty" class="images-empty" hidden>Não encontramos um artigo relacionado a este assunto.</p>
-                </section>
-              </div>
-            </div>
-            <div class="hub-pane" data-pane="exercises">
-              <div id="exercises-list" class="exercises-list"></div>
-            </div>
+          <div class="answer-content">
+            <section class="summary-block">
+              <h3>Resumo rápido</h3>
+              <ul id="summary-list"></ul>
+            </section>
+            <section class="mindmap-block">
+              <h3>Mapa mental</h3>
+              <div id="mindmap-container"></div>
+            </section>
+            <section class="explanation-block">
+              <h3>Explicação completa</h3>
+              <div id="explanation-content"></div>
+            </section>
+            <section class="images-block">
+              <h3>Saiba mais</h3>
+              <div id="images-grid" class="images-grid"></div>
+              <p id="images-empty" class="images-empty" hidden>Não encontramos um artigo relacionado a este assunto.</p>
+            </section>
           </div>
 
           <footer class="answer-footer">
             <p>Confira o conteúdo e adapte-o com suas próprias palavras.</p>
             <div class="answer-footer-actions">
+              <button id="generate-exercises" class="secondary-button" type="button">Gerar exercícios</button>
               <button id="new-question" class="secondary-button" type="button">Pesquisar outro assunto</button>
             </div>
           </footer>
         </section>
 
+        <section id="exercises" class="exercises-card" aria-live="polite" hidden>
+          <header class="exercises-header">
+            <h2>Exercícios para praticar</h2>
+            <button id="exercises-close" class="icon-button" type="button" aria-label="Fechar exercícios">×</button>
+          </header>
+          <div id="exercises-list" class="exercises-list"></div>
+        </section>
+
+        </div>
+
+        <div class="main-tab-pane" data-mainpane="simulados">
         <section class="quiz-card" id="simulados" aria-labelledby="quiz-heading">
           <div class="section-heading">
             <div>
@@ -279,6 +286,7 @@
             </div>
           </div>
         </section>
+        </div>
       </section>
     </main>
     <script src="app.js"></script>
