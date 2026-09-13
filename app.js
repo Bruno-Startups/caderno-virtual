@@ -102,7 +102,7 @@ function subjectPatternDataUri(subject, color) {
   const iconPath = SUBJECT_ICONS[subject];
   if (!iconPath) return 'none';
   const filled = iconPath.replaceAll('COLOR', color);
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='84' height='84' viewBox='0 0 84 84'><g transform='translate(6,6) scale(0.85)'>${filled}</g><g transform='translate(46,40) scale(0.6) rotate(18)'>${filled}</g></svg>`;
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 24 24'>${filled}</svg>`;
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 
