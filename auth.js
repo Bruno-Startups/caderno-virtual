@@ -108,4 +108,21 @@ async function apagarDoHistorico(id) {
   await supabaseClient.from("historico").delete().eq("id", id);
 }
 
+async function apagarHistoricoPorTopico(materia, topico, tipo) {
+  if (!usuarioAtual) return;
+  await supabaseClient.from("historico").delete()
+    .eq("materia", materia).eq("topico", topico).eq("tipo", tipo);
+}
+
+async function apagarHistoricoPorMateria(materia, tipo) {
+  if (!usuarioAtual) return;
+  await supabaseClient.from("historico").delete()
+    .eq("materia", materia).eq("tipo", tipo);
+}
+
+async function apagarHistoricoPorTipo(tipo) {
+  if (!usuarioAtual) return;
+  await supabaseClient.from("historico").delete().eq("tipo", tipo);
+}
+
 document.addEventListener("DOMContentLoaded", initAuth);

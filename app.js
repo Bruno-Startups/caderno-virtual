@@ -258,12 +258,18 @@ function deleteHistoryItem(subject, topic) {
   history[subject] = history[subject].filter((item) => item.topic !== topic);
   if (history[subject].length === 0) delete history[subject];
   saveHistory(history);
+  if (estaLogado() && typeof apagarHistoricoPorTopico === "function") {
+    apagarHistoricoPorTopico(subject, topic, "estudo").catch((error) => console.warn("Não foi possível apagar da conta:", error));
+  }
 }
 
 function deleteHistorySubject(subject) {
   const history = getHistory();
   delete history[subject];
   saveHistory(history);
+  if (estaLogado() && typeof apagarHistoricoPorMateria === "function") {
+    apagarHistoricoPorMateria(subject, "estudo").catch((error) => console.warn("Não foi possível apagar da conta:", error));
+  }
 }
 
 function renderHistory() {
@@ -538,10 +544,16 @@ clearHistory.addEventListener('click', () => {
   if (clearHistory.dataset.mode === 'simulados') {
     localStorage.removeItem(quizStorageKey);
     renderQuizSidebarHistory();
+    if (estaLogado() && typeof apagarHistoricoPorTipo === 'function') {
+      apagarHistoricoPorTipo('questao').catch((error) => console.warn('Não foi possível apagar da conta:', error));
+    }
   } else {
     localStorage.removeItem(storageKey);
     answer.hidden = true;
     renderHistory();
+    if (estaLogado() && typeof apagarHistoricoPorTipo === 'function') {
+      apagarHistoricoPorTipo('estudo').catch((error) => console.warn('Não foi possível apagar da conta:', error));
+    }
   }
 });
 
