@@ -699,8 +699,13 @@ const LEVEL_TITLES = [
   { min: 20, titulo: 'Destaque' },
   { min: 30, titulo: 'Expert' },
   { min: 50, titulo: 'Mestre' },
+  { min: 100, titulo: 'Lenda' },
+  { min: 500, titulo: 'Mítico' },
+  { min: 1000, titulo: 'Imortal' },
 ];
+const EMAIL_DEV = 'brunoescol05@gmail.com';
 function tituloDoNivel(level) {
+  if (estaLogado() && usuarioAtual.email === EMAIL_DEV) return 'DEV';
   let titulo = LEVEL_TITLES[0].titulo;
   for (const faixa of LEVEL_TITLES) if (level >= faixa.min) titulo = faixa.titulo;
   return titulo;
