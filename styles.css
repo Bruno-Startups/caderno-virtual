@@ -436,32 +436,37 @@ body.maintab-simulados .hero-subjects { display:none; }
 
 /* ===== Sistema de Progressão (XP/Nível) ===== */
 .progresso-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 202, 92, 0.07);
+  border: 1px solid rgba(255, 202, 92, 0.25);
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 12px 14px;
+  margin-top: 2px;
 }
 
 .progresso-top {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 6px;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
 }
 
 .progresso-nivel {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
   color: #ffca5c;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 
 .progresso-xp-label {
-  font-size: 11px;
+  font-size: 11.5px;
   color: #a9b7c9;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .progresso-bar-track {
-  height: 6px;
+  height: 7px;
   border-radius: 100px;
   background: rgba(255, 255, 255, 0.12);
   overflow: hidden;
@@ -470,7 +475,7 @@ body.maintab-simulados .hero-subjects { display:none; }
 .progresso-bar-fill {
   height: 100%;
   border-radius: 100px;
-  background: #ffca5c;
+  background: linear-gradient(90deg, #ffca5c, #f0a020);
   transition: width 1s cubic-bezier(.2,.8,.2,1);
 }
 
@@ -574,4 +579,315 @@ body.maintab-simulados .hero-subjects { display:none; }
 @keyframes xpEmojiBounce {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-3px) rotate(-8deg); }
+}
+
+/* ===== Guia de Prova ===== */
+.guia-prova {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 18px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: linear-gradient(160deg, #f6f3ff 0%, #fff 55%);
+  border: 1.5px solid #ded4fb;
+}
+
+.guia-prova-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.guia-prova-emoji { font-size: 20px; line-height: 1; }
+
+.guia-prova-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #4c2f9e;
+}
+
+.guia-prova-subtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #7c6aa8;
+}
+
+.guia-prova-timeline {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 14px;
+}
+
+.guia-prova-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 8px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.guia-prova-item:hover {
+  background: rgba(124, 58, 237, 0.08);
+  transform: translateX(2px);
+}
+
+.guia-prova-numero {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #7c3aed;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.guia-prova-item:not(:last-child) .guia-prova-numero::after {
+  content: "";
+  position: absolute;
+  top: 26px;
+  left: 50%;
+  width: 1.5px;
+  height: 22px;
+  background: #ded4fb;
+  transform: translateX(-50%);
+}
+
+.guia-prova-item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 2px;
+}
+
+.guia-prova-item-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.guia-prova-item-top strong {
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.guia-prova-badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 2px 7px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.guia-prova-badge-alta { background: #fff0d6; color: #a05a00; }
+.guia-prova-badge-media { background: #f0e9fc; color: #6941c6; }
+
+.guia-prova-item-detalhe {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.guia-prova-box {
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.guia-prova-box-title {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.guia-prova-dica {
+  background: #fff8e6;
+}
+.guia-prova-dica .guia-prova-box-title { color: #a05a00; }
+.guia-prova-dica p#guia-prova-dica-texto {
+  margin: 0;
+  font-size: 13px;
+  color: #6b5310;
+  line-height: 1.5;
+}
+
+.guia-prova-tempo {
+  background: #f3edfe;
+  margin-top: auto;
+}
+.guia-prova-tempo .guia-prova-box-title { color: #4c2f9e; }
+.guia-prova-tempo ol {
+  margin: 6px 0 4px;
+  padding-left: 18px;
+  font-size: 12.5px;
+  color: #4c2f9e;
+}
+.guia-prova-tempo li { margin-bottom: 2px; }
+.guia-prova-tempo-note {
+  margin: 4px 0 0;
+  font-size: 11.5px;
+  color: #7c6aa8;
+  font-style: italic;
+}
+
+/* ===== Cartão de progresso (sidebar) — redesenhado ===== */
+.progresso-card {
+  position: relative;
+  background: rgba(255, 202, 92, 0.07);
+  border: 1px solid rgba(255, 202, 92, 0.25);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 2px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.progresso-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+  border-color: rgba(255, 202, 92, 0.45);
+}
+
+.progresso-card-top {
+  margin-bottom: 8px;
+}
+
+.progresso-nivel-num {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffca5c;
+  letter-spacing: 0.01em;
+}
+
+.progresso-nivel-titulo {
+  display: block;
+  font-size: 11px;
+  color: #cdd7e4;
+  margin-top: 1px;
+}
+
+.progresso-bar-track {
+  height: 7px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.progresso-bar-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, #ffca5c, #f0a020);
+  width: 0%;
+}
+
+.progresso-card-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 7px;
+}
+
+.progresso-xp-atual {
+  font-size: 11.5px;
+  color: #e4e9f0;
+  font-weight: 600;
+}
+
+.progresso-xp-faltam {
+  font-size: 10.5px;
+  color: #9aa4b2;
+}
+
+.progresso-levelup-glow {
+  animation: progressoGlow 1.3s ease;
+}
+
+@keyframes progressoGlow {
+  0% { box-shadow: 0 0 0 0 rgba(255,202,92,0.75); }
+  50% { box-shadow: 0 0 0 10px rgba(255,202,92,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,202,92,0); }
+}
+
+.progresso-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #1b1e27;
+  border: 1px solid rgba(255,202,92,0.3);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  animation: progressoPopIn 0.18s ease both;
+}
+
+@keyframes progressoPopIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.progresso-popover-title {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffca5c;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.progresso-popover-nivel {
+  margin: 0 0 2px;
+  font-size: 13.5px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.progresso-popover-xp {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: #9aa4b2;
+}
+
+.progresso-popover-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 10px;
+}
+
+.progresso-popover-stats div {
+  text-align: center;
+}
+
+.progresso-popover-stats strong {
+  display: block;
+  font-size: 14px;
+  color: #ffca5c;
+}
+
+.progresso-popover-stats span {
+  font-size: 10px;
+  color: #9aa4b2;
 }

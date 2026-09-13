@@ -13,8 +13,6 @@ const answer = document.querySelector('#answer');
 const answerTitle = document.querySelector('#answer-title');
 const answerMeta = document.querySelector('#answer-meta');
 const summaryList = document.querySelector('#summary-list');
-const funFactCard = document.querySelector('#fun-fact');
-const funFactText = document.querySelector('#fun-fact-text');
 const explanationContent = document.querySelector('#explanation-content');
 const imagesGrid = document.querySelector('#images-grid');
 const imagesEmpty = document.querySelector('#images-empty');
@@ -462,17 +460,62 @@ function renderMindMap(topic, keywords, color, softColor) {
   `;
 }
 
+const guiaProvaEl = document.querySelector('#guia-prova');
+const guiaProvaTimelineEl = document.querySelector('#guia-prova-timeline');
+const guiaProvaDicaEl = document.querySelector('#guia-prova-dica');
+const guiaProvaDicaTextoEl = document.querySelector('#guia-prova-dica-texto');
+const guiaProvaTempoEl = document.querySelector('#guia-prova-tempo');
+const guiaProvaTempoListEl = document.querySelector('#guia-prova-tempo-list');
+
+function renderGuiaProva(guide) {
+  if (!guiaProvaEl) return;
+  const pontos = guide?.pontos || [];
+  if (pontos.length === 0) {
+    guiaProvaEl.hidden = true;
+    return;
+  }
+  guiaProvaEl.hidden = false;
+
+  guiaProvaTimelineEl.innerHTML = pontos.map((ponto, index) => `
+    <button type="button" class="guia-prova-item" data-index="${index}">
+      <span class="guia-prova-numero">${String(index + 1).padStart(2, '0')}</span>
+      <span class="guia-prova-item-body">
+        <span class="guia-prova-item-top">
+          <strong>${escapeHtml(ponto.titulo)}</strong>
+          <span class="guia-prova-badge guia-prova-badge-${ponto.importancia}">${ponto.importancia === 'alta' ? 'Muito importante' : 'Importante'}</span>
+        </span>
+        ${ponto.detalhe ? `<span class="guia-prova-item-detalhe">${escapeHtml(ponto.detalhe)}</span>` : ''}
+      </span>
+    </button>
+  `).join('');
+
+  guiaProvaTimelineEl.querySelectorAll('.guia-prova-item').forEach((el) => {
+    el.addEventListener('click', () => {
+      explanationContent.closest('.explanation-block')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  if (guide.dica) {
+    guiaProvaDicaTextoEl.textContent = guide.dica;
+    guiaProvaDicaEl.hidden = false;
+  } else {
+    guiaProvaDicaEl.hidden = true;
+  }
+
+  if (guide.poucoTempo && guide.poucoTempo.length > 0) {
+    guiaProvaTempoListEl.innerHTML = guide.poucoTempo.map((titulo) => `<li>${escapeHtml(titulo)}</li>`).join('');
+    guiaProvaTempoEl.hidden = false;
+  } else {
+    guiaProvaTempoEl.hidden = true;
+  }
+}
+
 function showAnswer(item, shouldScroll = true) {
   currentItem = item;
   answerTitle.textContent = item.topic;
   answerMeta.textContent = item.schoolYear ? `${item.subject} · ${item.schoolYear}` : item.subject;
   summaryList.innerHTML = item.summary.map((line) => `<li>${bold(line)}</li>`).join('');
-  if (item.funFact) {
-    funFactText.innerHTML = bold(item.funFact);
-    funFactCard.hidden = false;
-  } else {
-    funFactCard.hidden = true;
-  }
+  renderGuiaProva(item.examGuide);
   const palette = SUBJECT_COLORS[item.subject] || SUBJECT_COLORS['Matemática'];
   renderMindMap(item.topic, item.keywords, palette.color, palette.soft);
   explanationContent.innerHTML = renderExplanation(item.explanation);
@@ -514,7 +557,7 @@ form.addEventListener('submit', async (event) => {
     updateActivePill(wasAutoDetected);
     renderTopicChips(finalSubject);
 
-    const item = { subject: finalSubject, schoolYear, topic: data.topic || topic, summary: data.summary, keywords: data.keywords, funFact: data.funFact, explanation: data.explanation, images };
+    const item = { subject: finalSubject, schoolYear, topic: data.topic || topic, summary: data.summary, keywords: data.keywords, examGuide: data.examGuide, explanation: data.explanation, images };
     addToHistory(item);
     showAnswer(item);
   } catch (error) {
@@ -648,26 +691,119 @@ function computeLevel(totalXp) {
   return { level, currentXp: remaining, neededXp: needForLevel(level) };
 }
 
-const progressoCard = document.querySelector('#progresso-card');
-const progressoNivelEl = document.querySelector('#progresso-nivel');
-const progressoXpLabelEl = document.querySelector('#progresso-xp-label');
-const progressoBarFillEl = document.querySelector('#progresso-bar-fill');
+const LEVEL_TITLES = [
+  { min: 1, titulo: 'Iniciante' },
+  { min: 2, titulo: 'Aprendiz' },
+  { min: 5, titulo: 'Estudante' },
+  { min: 10, titulo: 'Dedicado' },
+  { min: 20, titulo: 'Destaque' },
+  { min: 30, titulo: 'Expert' },
+  { min: 50, titulo: 'Mestre' },
+];
+function tituloDoNivel(level) {
+  let titulo = LEVEL_TITLES[0].titulo;
+  for (const faixa of LEVEL_TITLES) if (level >= faixa.min) titulo = faixa.titulo;
+  return titulo;
+}
 
-function renderProgressoSidebar(totalXp) {
+const progressoCard = document.querySelector('#progresso-card');
+const progressoNivelNumEl = document.querySelector('#progresso-nivel-num');
+const progressoNivelTituloEl = document.querySelector('#progresso-nivel-titulo');
+const progressoXpAtualEl = document.querySelector('#progresso-xp-atual');
+const progressoXpFaltamEl = document.querySelector('#progresso-xp-faltam');
+const progressoBarFillEl = document.querySelector('#progresso-bar-fill');
+const progressoPopover = document.querySelector('#progresso-popover');
+
+let ultimoProgresso = null;
+
+function animarContagem(el, de, para, duracaoMs = 700) {
+  const inicio = performance.now();
+  function passo(agora) {
+    const t = Math.min(1, (agora - inicio) / duracaoMs);
+    const eased = 1 - Math.pow(1 - t, 3);
+    const valor = Math.round(de + (para - de) * eased);
+    el.textContent = valor.toLocaleString('pt-BR');
+    if (t < 1) requestAnimationFrame(passo);
+  }
+  requestAnimationFrame(passo);
+}
+
+function renderProgressoSidebar(totalXp, { animarDe = null, forcarGlow = false } = {}) {
   if (!progressoCard) return;
   const info = computeLevel(totalXp);
   progressoCard.hidden = false;
-  progressoNivelEl.textContent = `Nível ${info.level}`;
-  progressoXpLabelEl.textContent = `${info.currentXp.toLocaleString('pt-BR')} / ${info.neededXp.toLocaleString('pt-BR')} XP`;
-  progressoBarFillEl.style.width = `${Math.min(100, (info.currentXp / info.neededXp) * 100)}%`;
+  progressoNivelNumEl.textContent = `Nível ${info.level}`;
+  progressoNivelTituloEl.textContent = tituloDoNivel(info.level);
+  progressoXpFaltamEl.textContent = `${(info.neededXp - info.currentXp).toLocaleString('pt-BR')} XP para o próximo nível`;
+
+  const pct = Math.min(100, (info.currentXp / info.neededXp) * 100);
+
+  if (animarDe !== null) {
+    const antes = computeLevel(animarDe);
+    progressoBarFillEl.style.transition = 'none';
+    progressoBarFillEl.style.width = `${Math.min(100, (antes.currentXp / antes.neededXp) * 100)}%`;
+    void progressoBarFillEl.offsetWidth;
+    progressoBarFillEl.style.transition = 'width 1s cubic-bezier(.2,.8,.2,1)';
+    requestAnimationFrame(() => { progressoBarFillEl.style.width = `${pct}%`; });
+    animarContagem(progressoXpAtualElSpanRef(), antes.currentXp, info.currentXp);
+  } else {
+    progressoBarFillEl.style.transition = 'width 1s cubic-bezier(.2,.8,.2,1)';
+    requestAnimationFrame(() => { progressoBarFillEl.style.width = `${pct}%`; });
+    animarContagem(progressoXpAtualElSpanRef(), 0, info.currentXp);
+  }
+  progressoXpAtualNeededSuffix(info.neededXp);
+
+  if (forcarGlow) {
+    progressoCard.classList.add('progresso-levelup-glow');
+    setTimeout(() => progressoCard.classList.remove('progresso-levelup-glow'), 1400);
+  }
+}
+
+function progressoXpAtualElSpanRef() {
+  if (!progressoXpAtualEl.querySelector('.xp-num')) {
+    progressoXpAtualEl.innerHTML = '<span class="xp-num">0</span> / <span class="xp-needed">100</span> XP';
+  }
+  return progressoXpAtualEl.querySelector('.xp-num');
+}
+function progressoXpAtualNeededSuffix(needed) {
+  const el = progressoXpAtualEl.querySelector('.xp-needed');
+  if (el) el.textContent = needed.toLocaleString('pt-BR');
 }
 
 async function carregarProgresso() {
   if (typeof buscarProgressoNoBanco !== 'function') return;
   const progresso = await buscarProgressoNoBanco();
-  if (progresso) renderProgressoSidebar(progresso.total_xp || 0);
+  if (!progresso) return;
+  ultimoProgresso = progresso;
+  renderProgressoSidebar(progresso.total_xp || 0);
 }
 window.carregarProgresso = carregarProgresso;
+
+if (progressoCard) {
+  function toggleProgressoPopover() {
+    const abrir = progressoPopover.hidden;
+    progressoPopover.hidden = !abrir;
+    progressoCard.setAttribute('aria-expanded', String(abrir));
+    if (abrir && ultimoProgresso) {
+      const info = computeLevel(ultimoProgresso.total_xp || 0);
+      document.querySelector('#progresso-popover-nivel').textContent = `Nível ${info.level} — ${tituloDoNivel(info.level)}`;
+      document.querySelector('#progresso-popover-xp').textContent = `${info.currentXp.toLocaleString('pt-BR')} / ${info.neededXp.toLocaleString('pt-BR')} XP`;
+      document.querySelector('#pop-stat-simulados').textContent = ultimoProgresso.total_simulados || 0;
+      document.querySelector('#pop-stat-questoes').textContent = ultimoProgresso.total_questoes || 0;
+      const media = ultimoProgresso.total_questoes > 0
+        ? Math.round((ultimoProgresso.total_acertos / ultimoProgresso.total_questoes) * 100)
+        : 0;
+      document.querySelector('#pop-stat-media').textContent = `${media}%`;
+    }
+  }
+  progressoCard.addEventListener('click', toggleProgressoPopover);
+  progressoCard.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleProgressoPopover(); }
+  });
+  document.addEventListener('click', (event) => {
+    if (!progressoCard.contains(event.target)) { progressoPopover.hidden = true; progressoCard.setAttribute('aria-expanded', 'false'); }
+  });
+}
 
 const xpResultEl = document.querySelector('#xp-result');
 const xpResultNivelEl = document.querySelector('#xp-result-nivel');
@@ -733,7 +869,13 @@ async function processarXpDoSimulado() {
     setTimeout(() => xpResultEl.classList.remove('xp-levelup-flash'), 900);
   }
 
-  renderProgressoSidebar(resultado.totalXp);
+  renderProgressoSidebar(resultado.totalXp, {
+    animarDe: resultado.totalXp - resultado.xpAwarded,
+    forcarGlow: leveledUp,
+  });
+  ultimoProgresso = ultimoProgresso
+    ? { ...ultimoProgresso, total_xp: resultado.totalXp, total_simulados: (ultimoProgresso.total_simulados || 0) + 1, total_questoes: (ultimoProgresso.total_questoes || 0) + total, total_acertos: (ultimoProgresso.total_acertos || 0) + quizState.correct }
+    : { total_xp: resultado.totalXp, total_simulados: 1, total_questoes: total, total_acertos: quizState.correct };
   } catch (error) {
     console.warn('Falha ao processar XP do simulado:', error);
     xpResultEl.hidden = true;

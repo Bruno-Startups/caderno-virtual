@@ -68,13 +68,28 @@
             <span class="auth-user-avatar" aria-hidden="true">👤</span>
             <span id="nome-usuario" class="auth-user-email"></span>
           </div>
-          <div id="progresso-card" class="progresso-card" hidden>
-            <div class="progresso-top">
-              <span id="progresso-nivel" class="progresso-nivel">Nível 1</span>
-              <span id="progresso-xp-label" class="progresso-xp-label">0 / 100 XP</span>
+          <div id="progresso-card" class="progresso-card" hidden tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
+            <div class="progresso-card-top">
+              <span id="progresso-nivel-num" class="progresso-nivel-num">Nível 1</span>
+              <span id="progresso-nivel-titulo" class="progresso-nivel-titulo">Iniciante</span>
             </div>
             <div class="progresso-bar-track">
               <div id="progresso-bar-fill" class="progresso-bar-fill" style="width:0%"></div>
+            </div>
+            <div class="progresso-card-bottom">
+              <span id="progresso-xp-atual" class="progresso-xp-atual">0 / 100 XP</span>
+              <span id="progresso-xp-faltam" class="progresso-xp-faltam">100 XP para o próximo nível</span>
+            </div>
+
+            <div id="progresso-popover" class="progresso-popover" hidden>
+              <p class="progresso-popover-title">Seu progresso</p>
+              <p id="progresso-popover-nivel" class="progresso-popover-nivel"></p>
+              <p id="progresso-popover-xp" class="progresso-popover-xp"></p>
+              <div class="progresso-popover-stats">
+                <div><strong id="pop-stat-simulados">0</strong><span>Simulados</span></div>
+                <div><strong id="pop-stat-media">0%</strong><span>Média</span></div>
+                <div><strong id="pop-stat-questoes">0</strong><span>Questões</span></div>
+              </div>
             </div>
           </div>
           <button type="button" class="auth-logout-button" onclick="logout()">Sair</button>
@@ -168,11 +183,23 @@
               <section class="summary-block">
                 <h3>Resumo rápido</h3>
                 <ul id="summary-list"></ul>
-                <div id="fun-fact" class="fun-fact-card" hidden>
-                  <span class="fun-fact-icon" aria-hidden="true">💡</span>
-                  <div>
-                    <p class="fun-fact-label">Você sabia?</p>
-                    <p id="fun-fact-text"></p>
+                <div id="guia-prova" class="guia-prova" hidden>
+                  <div class="guia-prova-header">
+                    <span class="guia-prova-emoji" aria-hidden="true">🎯</span>
+                    <div>
+                      <p class="guia-prova-title">Guia de prova</p>
+                      <p class="guia-prova-subtitle">O que você realmente precisa saber</p>
+                    </div>
+                  </div>
+                  <div id="guia-prova-timeline" class="guia-prova-timeline"></div>
+                  <div id="guia-prova-dica" class="guia-prova-box guia-prova-dica" hidden>
+                    <p class="guia-prova-box-title">💡 Dica para a prova</p>
+                    <p id="guia-prova-dica-texto"></p>
+                  </div>
+                  <div id="guia-prova-tempo" class="guia-prova-box guia-prova-tempo" hidden>
+                    <p class="guia-prova-box-title">⚡ Se tiver pouco tempo</p>
+                    <ol id="guia-prova-tempo-list"></ol>
+                    <p class="guia-prova-tempo-note">Comece por esses pontos.</p>
                   </div>
                 </div>
               </section>
