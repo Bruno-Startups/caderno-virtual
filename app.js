@@ -86,10 +86,32 @@ const EXAMPLE_TOPICS = {
   '': ['Equação de 1º grau', 'Revolução Francesa', 'Fotossíntese', 'Present perfect'],
 };
 
+const SUBJECT_ICONS = {
+  'Matemática': '<path d="M4 4h16M4 20h16M8 4l8 16M16 4l-8 16" stroke="COLOR" stroke-width="1.4" fill="none" stroke-linecap="round"/>',
+  'Português': '<path d="M4 4c4-1 6-1 8 0v16c-2-1-4-1-8 0V4Z" stroke="COLOR" stroke-width="1.3" fill="none"/><path d="M20 4c-4-1-6-1-8 0v16c2-1 4-1 8 0V4Z" stroke="COLOR" stroke-width="1.3" fill="none"/>',
+  'História': '<path d="M4 20h16M6 20V9M10 20V9M14 20V9M18 20V9M4 9l8-5 8 5" stroke="COLOR" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  'Geografia': '<circle cx="12" cy="12" r="8" stroke="COLOR" stroke-width="1.3" fill="none"/><path d="M4 12h16M12 4c3 3 3 13 0 16M12 4c-3 3-3 13 0 16" stroke="COLOR" stroke-width="1.1" fill="none"/>',
+  'Ciências': '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3" stroke="COLOR" stroke-width="1.3" fill="none" stroke-linejoin="round"/>',
+  'Inglês': '<path d="M4 5h16v10H9l-3 3v-3H4V5Z" stroke="COLOR" stroke-width="1.3" fill="none" stroke-linejoin="round"/>',
+  'Física': '<circle cx="12" cy="12" r="1.6" fill="COLOR"/><ellipse cx="12" cy="12" rx="9" ry="4" stroke="COLOR" stroke-width="1.1" fill="none"/><ellipse cx="12" cy="12" rx="9" ry="4" stroke="COLOR" stroke-width="1.1" fill="none" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="4" stroke="COLOR" stroke-width="1.1" fill="none" transform="rotate(120 12 12)"/>',
+  'Química': '<path d="M9 2h6M10 2v7l-5.5 9.5A1.5 1.5 0 0 0 6 21h12a1.5 1.5 0 0 0 1.5-2.5L14 9V2" stroke="COLOR" stroke-width="1.3" fill="none" stroke-linejoin="round"/><circle cx="9.5" cy="16" r="0.9" fill="COLOR"/><circle cx="13" cy="18" r="0.7" fill="COLOR"/>',
+  'Biologia': '<path d="M4 20c8 0 14-6 14-16C8 4 4 12 4 20Z" stroke="COLOR" stroke-width="1.3" fill="none"/><path d="M4 20c4-6 8-10 14-16" stroke="COLOR" stroke-width="1" fill="none"/>',
+};
+
+function subjectPatternDataUri(subject, color) {
+  const iconPath = SUBJECT_ICONS[subject];
+  if (!iconPath) return 'none';
+  const filled = iconPath.replaceAll('COLOR', color);
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='84' height='84' viewBox='0 0 84 84'><g transform='translate(6,6) scale(0.85)'>${filled}</g><g transform='translate(46,40) scale(0.6) rotate(18)'>${filled}</g></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
+
 function applySubjectColor(subject) {
   const palette = SUBJECT_COLORS[subject];
-  document.documentElement.style.setProperty('--blue', palette ? palette.color : '#1f66b2');
+  const color = palette ? palette.color : '#1f66b2';
+  document.documentElement.style.setProperty('--blue', color);
   document.documentElement.style.setProperty('--blue-soft', palette ? palette.soft : '#eaf3ff');
+  document.documentElement.style.setProperty('--subject-pattern', subjectPatternDataUri(subject, color));
 }
 
 function renderHeroSubjects() {
