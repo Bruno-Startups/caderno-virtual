@@ -629,7 +629,111 @@ safeRun('topic-chips', () => renderTopicChips(''));
 safeRun('dedup-history', dedupExistingHistory);
 safeRun('render-history', renderHistory);
 
-/* ===== Questões e Simulados ===== */
+/* ===== Sistema de Progressão (XP/Nível) =====
+   Regra de ouro: XP é permanente e vive na conta (tabela progresso_alunos no Supabase),
+   nunca é derivado do histórico. Apagar histórico não afeta XP nem nível.
+   O servidor (/api/finish-quiz) é a única fonte que grava XP — o frontend só exibe. */
+
+function needForLevel(level) {
+  return Math.round(100 * Math.pow(level, 1.5));
+}
+
+function computeLevel(totalXp) {
+  let level = 1;
+  let remaining = totalXp;
+  while (remaining >= needForLevel(level)) {
+    remaining -= needForLevel(level);
+    level += 1;
+  }
+  return { level, currentXp: remaining, neededXp: needForLevel(level) };
+}
+
+const progressoCard = document.querySelector('#progresso-card');
+const progressoNivelEl = document.querySelector('#progresso-nivel');
+const progressoXpLabelEl = document.querySelector('#progresso-xp-label');
+const progressoBarFillEl = document.querySelector('#progresso-bar-fill');
+
+function renderProgressoSidebar(totalXp) {
+  if (!progressoCard) return;
+  const info = computeLevel(totalXp);
+  progressoCard.hidden = false;
+  progressoNivelEl.textContent = `Nível ${info.level}`;
+  progressoXpLabelEl.textContent = `${info.currentXp.toLocaleString('pt-BR')} / ${info.neededXp.toLocaleString('pt-BR')} XP`;
+  progressoBarFillEl.style.width = `${Math.min(100, (info.currentXp / info.neededXp) * 100)}%`;
+}
+
+async function carregarProgresso() {
+  if (typeof buscarProgressoNoBanco !== 'function') return;
+  const progresso = await buscarProgressoNoBanco();
+  if (progresso) renderProgressoSidebar(progresso.total_xp || 0);
+}
+window.carregarProgresso = carregarProgresso;
+
+const xpResultEl = document.querySelector('#xp-result');
+const xpResultNivelEl = document.querySelector('#xp-result-nivel');
+const xpGainedTagEl = document.querySelector('#xp-gained-tag');
+const xpResultBarFillEl = document.querySelector('#xp-result-bar-fill');
+const xpResultLabelEl = document.querySelector('#xp-result-label');
+const xpLevelupBanner = document.querySelector('#xp-levelup-banner');
+const xpLevelupNivelEl = document.querySelector('#xp-levelup-nivel');
+
+function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
+
+async function processarXpDoSimulado() {
+  if (!xpResultEl) return;
+  if (typeof estaLogado !== 'function' || !estaLogado() || typeof enviarResultadoSimulado !== 'function') {
+    xpResultEl.hidden = true;
+    return;
+  }
+
+  const total = quizState.correct + quizState.wrong;
+  const resultado = await enviarResultadoSimulado(quizState.attemptId, quizState.correct, total);
+  if (!resultado) { xpResultEl.hidden = true; return; }
+
+  xpResultEl.hidden = false;
+  xpLevelupBanner.hidden = true;
+  xpGainedTagEl.textContent = `+${resultado.xpAwarded} XP`;
+  xpGainedTagEl.classList.remove('xp-gained-pop');
+
+  xpResultNivelEl.textContent = `Nível ${resultado.before.level}`;
+  xpResultBarFillEl.style.transition = 'none';
+  xpResultBarFillEl.style.width = `${Math.min(100, (resultado.before.currentXp / resultado.before.neededXp) * 100)}%`;
+  xpResultLabelEl.textContent = `${resultado.before.currentXp.toLocaleString('pt-BR')} / ${resultado.before.neededXp.toLocaleString('pt-BR')} XP`;
+
+  void xpResultEl.offsetWidth;
+
+  if (resultado.xpAwarded > 0) {
+    await sleep(250);
+    xpGainedTagEl.classList.add('xp-gained-pop');
+  }
+
+  await sleep(500);
+  xpResultBarFillEl.style.transition = 'width 1.1s cubic-bezier(.2,.8,.2,1)';
+
+  const leveledUp = resultado.after.level > resultado.before.level;
+
+  if (!leveledUp) {
+    xpResultBarFillEl.style.width = `${Math.min(100, (resultado.after.currentXp / resultado.after.neededXp) * 100)}%`;
+    xpResultLabelEl.textContent = `${resultado.after.currentXp.toLocaleString('pt-BR')} / ${resultado.after.neededXp.toLocaleString('pt-BR')} XP`;
+  } else {
+    xpResultBarFillEl.style.width = '100%';
+    await sleep(1150);
+    xpResultEl.classList.add('xp-levelup-flash');
+    xpResultNivelEl.textContent = `Nível ${resultado.after.level}`;
+    xpLevelupNivelEl.textContent = `Nível ${resultado.after.level}`;
+    xpLevelupBanner.hidden = false;
+    xpResultBarFillEl.style.transition = 'none';
+    xpResultBarFillEl.style.width = '0%';
+    void xpResultEl.offsetWidth;
+    xpResultBarFillEl.style.transition = 'width 0.9s cubic-bezier(.2,.8,.2,1)';
+    await sleep(50);
+    xpResultBarFillEl.style.width = `${Math.min(100, (resultado.after.currentXp / resultado.after.neededXp) * 100)}%`;
+    xpResultLabelEl.textContent = `${resultado.after.currentXp.toLocaleString('pt-BR')} / ${resultado.after.neededXp.toLocaleString('pt-BR')} XP`;
+    setTimeout(() => xpResultEl.classList.remove('xp-levelup-flash'), 900);
+  }
+
+  renderProgressoSidebar(resultado.totalXp);
+}
 
 const quizStorageKey = 'caderno-virtual-questoes-v1';
 const DIFFICULTY_ORDER = ['facil', 'medio', 'dificil'];
@@ -823,6 +927,7 @@ quizSetupForm.addEventListener('submit', async (event) => {
     wrong: 0,
     weak: {},
     current: null,
+    attemptId: (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`),
   };
 
   quizSetupForm.hidden = true;
@@ -1012,6 +1117,7 @@ function finishQuiz() {
   }
 
   renderQuizSidebarHistory();
+  processarXpDoSimulado();
 }
 
 quizRestartButton.addEventListener('click', () => {

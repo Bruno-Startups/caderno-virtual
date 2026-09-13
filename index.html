@@ -68,6 +68,15 @@
             <span class="auth-user-avatar" aria-hidden="true">👤</span>
             <span id="nome-usuario" class="auth-user-email"></span>
           </div>
+          <div id="progresso-card" class="progresso-card" hidden>
+            <div class="progresso-top">
+              <span id="progresso-nivel" class="progresso-nivel">Nível 1</span>
+              <span id="progresso-xp-label" class="progresso-xp-label">0 / 100 XP</span>
+            </div>
+            <div class="progresso-bar-track">
+              <div id="progresso-bar-fill" class="progresso-bar-fill" style="width:0%"></div>
+            </div>
+          </div>
           <button type="button" class="auth-logout-button" onclick="logout()">Sair</button>
         </div>
 
@@ -297,6 +306,22 @@
               <div class="quiz-stat"><strong id="quiz-stat-percent">0%</strong><span>Aproveitamento</span></div>
             </div>
             <div id="quiz-summary-weak" class="quiz-summary-weak"></div>
+
+            <div id="xp-result" class="xp-result" hidden>
+              <div class="xp-result-header">
+                <span id="xp-result-nivel" class="xp-result-nivel">Nível 1</span>
+                <span id="xp-gained-tag" class="xp-gained-tag">+0 XP</span>
+              </div>
+              <div class="xp-result-bar-track">
+                <div id="xp-result-bar-fill" class="xp-result-bar-fill" style="width:0%"></div>
+              </div>
+              <p id="xp-result-label" class="xp-result-label">0 / 100 XP</p>
+              <div id="xp-levelup-banner" class="xp-levelup-banner" hidden>
+                <span class="xp-levelup-emoji" aria-hidden="true">🎉</span>
+                <span>Level up! Você chegou ao <strong id="xp-levelup-nivel">Nível 2</strong></span>
+              </div>
+            </div>
+
             <div class="form-footer">
               <button type="button" id="quiz-restart-button" class="primary-button"><span>Fazer novo simulado</span></button>
             </div>

@@ -31,6 +31,7 @@ function atualizarUI() {
     const nomeEl = document.getElementById("nome-usuario");
     if (nomeEl) nomeEl.textContent = usuarioAtual.email;
     if (typeof baixarHistoricoDaNuvem === "function") baixarHistoricoDaNuvem();
+    if (typeof carregarProgresso === "function") carregarProgresso();
   } else {
     areaLogado.style.display = "none";
     areaDeslogado.style.display = "flex";
@@ -123,6 +124,40 @@ async function apagarHistoricoPorMateria(materia, tipo) {
 async function apagarHistoricoPorTipo(tipo) {
   if (!usuarioAtual) return;
   await supabaseClient.from("historico").delete().eq("tipo", tipo);
+}
+
+// ---------- Progressão (XP/nível) — somente leitura pelo cliente; gravação é feita pelo servidor ----------
+async function getAccessToken() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  return session?.access_token || null;
+}
+
+async function buscarProgressoNoBanco() {
+  if (!usuarioAtual) return null;
+  const { data, error } = await supabaseClient
+    .from("progresso_alunos")
+    .select("*")
+    .eq("user_id", usuarioAtual.id)
+    .maybeSingle();
+  if (error) { console.warn("Não foi possível carregar o progresso:", error); return null; }
+  return data || { total_xp: 0, total_simulados: 0, total_questoes: 0, total_acertos: 0 };
+}
+
+async function enviarResultadoSimulado(attemptId, correct, total) {
+  const token = await getAccessToken();
+  if (!token) return null;
+  try {
+    const response = await fetch("/api/finish-quiz", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ attemptId, correct, total }),
+    });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch (error) {
+    console.warn("Não foi possível registrar o XP do simulado:", error);
+    return null;
+  }
 }
 
 document.addEventListener("DOMContentLoaded", initAuth);
