@@ -53,7 +53,7 @@ button, textarea, select { font:inherit; } button { cursor:pointer; } .skip-link
 .topic-chips { display:flex; flex-wrap:wrap; gap:7px; margin-top:10px; }
 .topic-chip { padding:6px 12px; border:1px solid var(--line); border-radius:100px; background:#f7faff; color:var(--blue); font-size:12px; font-weight:600; cursor:pointer; transition:.12s ease; }
 .topic-chip:hover { background:var(--blue-soft); border-color:var(--blue); }
-.form-footer { display:flex; align-items:center; justify-content:space-between; gap:20px; margin-top:24px; }.privacy-note { max-width:385px; margin:0; color:var(--muted); font-size:12px; }.primary-button,.secondary-button { display:inline-flex; justify-content:center; align-items:center; gap:20px; border:0; border-radius:10px; font-weight:800; }.primary-button { padding:13px 17px; background:var(--blue); color:white; box-shadow:0 7px 13px rgba(31,102,178,.21); }.primary-button:hover { background:#185899; }.answer-card { margin-top:28px; overflow:hidden; padding:0; }.answer-header { display:flex; align-items:center; gap:12px; padding:20px 24px; background:var(--ink); color:white; }.answer-header .eyebrow { color:#a5c5e7; }.answer-header h2 { font-size:23px; }.answer-icon { background:#2475ca; color:white; }.answer-tag { margin-left:auto; padding:4px 9px; border-radius:100px; background:#244b76; color:#dbeeff; font-size:11px; font-weight:800; }.answer-content { padding:25px 26px 4px; color:#243a55; }.answer-content strong { color:var(--ink); font-weight:800; }.answer-content h3 { margin:0 0 9px; color:var(--ink); font-family:Georgia,serif; font-size:20px; }.answer-content p,.answer-content li { font-size:15px; }.answer-content ul,.answer-content ol { padding-left:21px; }.formula { display:block; margin:17px 0; padding:13px 16px; border-radius:9px; background:#edf5fe; color:#174b82; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:16px; text-align:center; }.answer-footer { display:flex; flex-direction:column; align-items:stretch; gap:14px; padding:24px 26px 28px; border-top:1px solid var(--line); background:#f7faff; }.answer-footer p { margin:0; color:var(--muted); font-size:12px; text-align:center; }.secondary-button { padding:15px 18px; border:1.5px solid var(--blue); background:white; color:var(--blue); font-size:15px; }.answer-footer-actions { display:flex; gap:12px; }.answer-footer-actions .secondary-button { flex:1; }#generate-exercises { background:var(--blue); color:white; border-color:var(--blue); box-shadow:0 7px 13px rgba(31,102,178,.21); }#generate-exercises:hover { background:#185899; }
+.form-footer { display:flex; align-items:center; justify-content:space-between; gap:20px; margin-top:24px; }.privacy-note { max-width:385px; margin:0; color:var(--muted); font-size:12px; }.primary-button,.secondary-button { display:inline-flex; justify-content:center; align-items:center; gap:20px; border:0; border-radius:10px; font-weight:800; }.primary-button { padding:13px 17px; background:var(--blue); color:white; box-shadow:0 7px 13px rgba(31,102,178,.21); }.primary-button:hover { background:#185899; }.answer-card { margin-top:28px; overflow:hidden; padding:0; }.answer-header { display:flex; align-items:center; gap:12px; padding:20px 24px; background:var(--ink); color:white; }.answer-header .eyebrow { color:#a5c5e7; }.answer-header h2 { font-size:23px; }.answer-icon { background:var(--blue); color:white; }.answer-tag { margin-left:auto; padding:4px 9px; border-radius:100px; background:#244b76; color:#dbeeff; font-size:11px; font-weight:800; }.answer-content { padding:25px 26px 4px; color:#243a55; }.answer-content strong { color:var(--ink); font-weight:800; }.answer-content h3 { margin:0 0 9px; color:var(--ink); font-family:Georgia,serif; font-size:20px; }.answer-content p,.answer-content li { font-size:15px; }.answer-content ul,.answer-content ol { padding-left:21px; }.formula { display:block; margin:17px 0; padding:13px 16px; border-radius:9px; background:#edf5fe; color:#174b82; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:16px; text-align:center; }.answer-footer { display:flex; flex-direction:column; align-items:stretch; gap:14px; padding:24px 26px 28px; border-top:1px solid var(--line); background:#f7faff; }.answer-footer p { margin:0; color:var(--muted); font-size:12px; text-align:center; }.secondary-button { padding:15px 18px; border:1.5px solid var(--blue); background:white; color:var(--blue); font-size:15px; }.answer-footer-actions { display:flex; gap:12px; }.answer-footer-actions .secondary-button { flex:1; }#generate-exercises { background:var(--blue); color:white; border-color:var(--blue); box-shadow:0 7px 13px rgba(31,102,178,.21); }#generate-exercises:hover { background:#185899; }
 .context-fields { margin-top:24px; padding:15px; border-radius:10px; background:#f7faff; }.context-title { margin:0; color:var(--ink); font-size:14px; font-weight:750; }.context-title span { margin-left:5px; color:var(--muted); font-size:12px; font-weight:500; }.context-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }.context-grid label { display:block; color:var(--muted); font-size:12px; font-weight:700; }.context-grid select { display:block; width:100%; margin-top:7px; padding:13px 40px 13px 14px; border:1.5px solid #cbd6e3; border-radius:10px; background:white url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3e%3cpath d='M1 1l7 7 7-7' stroke='%231f66b2' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e") no-repeat right 14px center; appearance:none; color:var(--ink); font-size:15px; font-weight:600; cursor:pointer; transition:border .15s,box-shadow .15s; }.context-grid select:hover { border-color:var(--blue); }.context-grid select:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 4px rgba(31,102,178,.14); }.primary-button:disabled { cursor:wait; opacity:.72; }
 .cs-wrap { position:relative; margin-top:7px; }
 .cs-native { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
@@ -293,38 +293,56 @@ body.maintab-simulados .hero-subjects { display:none; }
 .answer-header::before {
   content: "";
   position: absolute;
-  top: -20px;
-  right: -20px;
-  width: 140px;
-  height: 140px;
+  top: -22px;
+  right: -22px;
+  width: 150px;
+  height: 150px;
   background-image: var(--subject-pattern, none);
   background-repeat: no-repeat;
   background-size: contain;
-  opacity: 0.22;
+  opacity: 0.28;
   z-index: -1;
   pointer-events: none;
 }
 
 .summary-block,
 .explanation-block,
-.mindmap-block {
+.mindmap-block,
+.images-block {
   position: relative;
   overflow: hidden;
   isolation: isolate;
 }
 
 .summary-block::before,
-.explanation-block::before {
+.explanation-block::before,
+.images-block::before {
   content: "";
   position: absolute;
-  bottom: -18px;
-  right: -18px;
-  width: 110px;
-  height: 110px;
+  bottom: -30px;
+  right: -30px;
+  width: 170px;
+  height: 170px;
+  background-image: var(--subject-pattern, none);
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.13;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.summary-block::after {
+  content: "";
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  width: 90px;
+  height: 90px;
   background-image: var(--subject-pattern, none);
   background-repeat: no-repeat;
   background-size: contain;
   opacity: 0.08;
+  transform: rotate(-18deg);
   z-index: -1;
   pointer-events: none;
 }
@@ -342,9 +360,10 @@ body.maintab-simulados .hero-subjects { display:none; }
       "images images";
     gap: 20px;
     align-items: start;
+    grid-auto-rows: min-content;
   }
-  .summary-block { grid-area: summary; margin: 0; align-self: start; height: max-content; }
-  .explanation-block { grid-area: explanation; margin: 0; align-self: start; height: max-content; }
+  .summary-block { grid-area: summary; margin: 0 !important; align-self: start !important; height: max-content !important; }
+  .explanation-block { grid-area: explanation; margin: 0 !important; align-self: start !important; height: max-content !important; }
   .mindmap-block { grid-area: mindmap; margin: 0; }
   .images-block { grid-area: images; margin: 0; }
 
