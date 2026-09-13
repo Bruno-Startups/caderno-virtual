@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </head>
   <body>
     <div class="intro-overlay" id="intro-overlay" aria-hidden="true">
@@ -57,6 +58,16 @@
           </span>
           <span>Caderno<br />Virtual</span>
         </a>
+
+        <div id="area-deslogado" class="auth-area">
+          <button type="button" class="secondary-button" onclick="abrirModalAuth('login')">Entrar</button>
+          <button type="button" class="primary-button" onclick="abrirModalAuth('cadastro')">Cadastrar</button>
+        </div>
+        <div id="area-logado" class="auth-area" style="display:none;">
+          <span id="nome-usuario" class="auth-user-email"></span>
+          <button type="button" class="secondary-button" onclick="logout()">Sair</button>
+        </div>
+
         <div class="history-heading">
           <div>
             <p class="history-title"><span class="history-title-icon" aria-hidden="true">🕘</span> Seu histórico</p>
@@ -281,6 +292,71 @@
         </div>
       </section>
     </main>
+
+    <div id="modal-auth" class="modal-auth-overlay" style="display:none;">
+      <div class="modal-auth-box">
+        <button class="modal-auth-fechar" type="button" onclick="fecharModalAuth()">×</button>
+
+        <div id="modal-auth-login">
+          <h2>Entrar</h2>
+          <input type="email" id="login-email" placeholder="Email" />
+          <input type="password" id="login-senha" placeholder="Senha" />
+          <button type="button" onclick="handleLogin()">Entrar</button>
+          <p><a href="#" onclick="handleRecuperarSenha(); return false;">Esqueci minha senha</a></p>
+          <p>Não tem conta? <a href="#" onclick="trocarAba('cadastro'); return false;">Cadastre-se</a></p>
+          <p id="login-msg" class="modal-auth-msg"></p>
+        </div>
+
+        <div id="modal-auth-cadastro" style="display:none;">
+          <h2>Criar conta</h2>
+          <input type="email" id="cadastro-email" placeholder="Email" />
+          <input type="password" id="cadastro-senha" placeholder="Senha (mín. 6 caracteres)" />
+          <button type="button" onclick="handleCadastro()">Cadastrar</button>
+          <p>Já tem conta? <a href="#" onclick="trocarAba('login'); return false;">Entrar</a></p>
+          <p id="cadastro-msg" class="modal-auth-msg"></p>
+        </div>
+      </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+      function abrirModalAuth(aba) {
+        document.getElementById("modal-auth").style.display = "flex";
+        trocarAba(aba);
+      }
+      function fecharModalAuth() {
+        document.getElementById("modal-auth").style.display = "none";
+      }
+      function trocarAba(aba) {
+        document.getElementById("modal-auth-login").style.display = aba === "login" ? "block" : "none";
+        document.getElementById("modal-auth-cadastro").style.display = aba === "cadastro" ? "block" : "none";
+      }
+      async function handleLogin() {
+        const email = document.getElementById("login-email").value;
+        const senha = document.getElementById("login-senha").value;
+        const r = await login(email, senha);
+        const msg = document.getElementById("login-msg");
+        if (r.ok) { fecharModalAuth(); } else { msg.textContent = r.erro; }
+      }
+      async function handleCadastro() {
+        const email = document.getElementById("cadastro-email").value;
+        const senha = document.getElementById("cadastro-senha").value;
+        const r = await cadastrar(email, senha);
+        const msg = document.getElementById("cadastro-msg");
+        if (!r.ok) { msg.textContent = r.erro; return; }
+        msg.style.color = "green";
+        msg.textContent = r.precisaConfirmarEmail
+          ? "Conta criada! Confirma seu email pra entrar."
+          : "Conta criada com sucesso!";
+        if (!r.precisaConfirmarEmail) fecharModalAuth();
+      }
+      async function handleRecuperarSenha() {
+        const email = document.getElementById("login-email").value;
+        if (!email) { alert("Digita seu email no campo acima primeiro."); return; }
+        const r = await recuperarSenha(email);
+        alert(r.ok ? "Email de recuperação enviado!" : r.erro);
+      }
+    </script>
     <script src="app.js"></script>
   </body>
 </html>
