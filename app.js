@@ -39,9 +39,11 @@ function setMainTab(name) {
   const historyCaption = document.querySelector('#history-caption');
   if (name === 'simulados') {
     historyCaption.textContent = 'Seu desempenho nos simulados, salvo neste aparelho.';
+    applySubjectColor(quizSelectedSubject);
     renderQuizSidebarHistory();
   } else {
     historyCaption.textContent = 'Seus assuntos ficam salvos por matéria, neste aparelho.';
+    applySubjectColor(form.elements.subject.value);
     renderHistory();
   }
 }
@@ -682,11 +684,13 @@ quizSubjectPillsContainer.addEventListener('click', (event) => {
     updateQuizSubjectPills();
     setQuizTopicFieldVisibility(true);
     renderQuizTopicChips('');
+    applySubjectColor('');
     return;
   }
   quizSelectedSubject = pill.dataset.subject;
   updateQuizSubjectPills();
   setQuizTopicFieldVisibility(false);
+  applySubjectColor(quizSelectedSubject);
 });
 
 function wirePillSelect(container, hiddenInput) {
@@ -726,6 +730,7 @@ const MODE_LABELS = { enem: 'ENEM', vestibular: 'Vestibular', escolar: 'Prova es
 
 function renderQuizSidebarHistory() {
   const records = getQuizHistory();
+  clearHistory.hidden = records.length === 0;
   if (records.length === 0) {
     historyList.innerHTML = '<p class="empty-history">Faça seu primeiro simulado pra ver seu desempenho aqui.</p>';
     return;
@@ -986,6 +991,7 @@ quizRestartButton.addEventListener('click', () => {
   updateQuizSubjectPills();
   setQuizTopicFieldVisibility(true);
   renderQuizTopicChips('');
+  applySubjectColor('');
   quizState = null;
 });
 
