@@ -4,17 +4,17 @@
 const SUPABASE_URL = "https://wmtjltnagzgwpypjqdtu.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_OVc4BkuMJBPU2aa0EatxOw_fYxNpja8";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let usuarioAtual = null;
 
 // ---------- Estado inicial ----------
 async function initAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await supabaseClient.auth.getSession();
   usuarioAtual = session?.user ?? null;
   atualizarUI();
 
-  supabase.auth.onAuthStateChange((_event, session) => {
+  supabaseClient.auth.onAuthStateChange((_event, session) => {
     usuarioAtual = session?.user ?? null;
     atualizarUI();
   });
@@ -39,21 +39,21 @@ function atualizarUI() {
 
 // ---------- Cadastro ----------
 async function cadastrar(email, senha) {
-  const { data, error } = await supabase.auth.signUp({ email, password: senha });
+  const { data, error } = await supabaseClient.auth.signUp({ email, password: senha });
   if (error) return { ok: false, erro: traduzirErro(error.message) };
   return { ok: true, precisaConfirmarEmail: !data.session };
 }
 
 // ---------- Login email/senha ----------
 async function login(email, senha) {
-  const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
   if (error) return { ok: false, erro: traduzirErro(error.message) };
   return { ok: true };
 }
 
 // ---------- Login Google (ativar depois de configurar o provider no Supabase) ----------
 async function loginComGoogle() {
-  const { error } = await supabase.auth.signInWithOAuth({
+  const { error } = await supabaseClient.auth.signInWithOAuth({
     provider: "google",
     options: { redirectTo: window.location.origin }
   });
@@ -62,12 +62,12 @@ async function loginComGoogle() {
 
 // ---------- Logout ----------
 async function logout() {
-  await supabase.auth.signOut();
+  await supabaseClient.auth.signOut();
 }
 
 // ---------- Recuperar senha ----------
 async function recuperarSenha(email) {
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
     redirectTo: window.location.origin
   });
   if (error) return { ok: false, erro: traduzirErro(error.message) };
@@ -87,7 +87,7 @@ function traduzirErro(msg) {
 // ---------- Histórico ligado ao usuário ----------
 async function salvarNoHistorico(materia, topico, tipo, dadosJson) {
   if (!usuarioAtual) return;
-  await supabase.from("historico").insert({
+  await supabaseClient.from("historico").insert({
     user_id: usuarioAtual.id,
     materia, topico, tipo,
     dados: dadosJson
@@ -96,7 +96,7 @@ async function salvarNoHistorico(materia, topico, tipo, dadosJson) {
 
 async function carregarHistoricoDoBanco() {
   if (!usuarioAtual) return [];
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("historico")
     .select("*")
     .order("created_at", { ascending: false });
@@ -105,7 +105,7 @@ async function carregarHistoricoDoBanco() {
 }
 
 async function apagarDoHistorico(id) {
-  await supabase.from("historico").delete().eq("id", id);
+  await supabaseClient.from("historico").delete().eq("id", id);
 }
 
 document.addEventListener("DOMContentLoaded", initAuth);
