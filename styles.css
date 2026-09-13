@@ -1102,3 +1102,52 @@ body.maintab-simulados .hero-subjects { display:none; }
 .auth-eye.piscando .eye-lid {
   transform: translateY(-8px);
 }
+
+/* ===== Ajustes de celular pros componentes novos (Guia de Prova, XP, resultado do simulado) ===== */
+@media (max-width: 800px) {
+  .guia-prova {
+    padding: 16px 16px;
+    margin-top: 14px;
+  }
+  .guia-prova-header { gap: 8px; margin-bottom: 12px; }
+  .guia-prova-emoji { font-size: 18px; }
+  .guia-prova-title { font-size: 14px; }
+  .guia-prova-subtitle { font-size: 11.5px; }
+  .guia-prova-item { padding: 8px 4px; }
+  .guia-prova-numero { width: 24px; height: 24px; font-size: 10.5px; }
+  .guia-prova-item-top { gap: 6px; }
+  .guia-prova-item-top strong { font-size: 13px; }
+  .guia-prova-badge { font-size: 9.5px; padding: 2px 6px; }
+  .guia-prova-item-detalhe { font-size: 12px; }
+  .guia-prova-box { padding: 11px 12px; }
+
+  .answer-header::before { width: 100px; height: 100px; top: -14px; right: -14px; }
+  .answer-icon { width: 30px; height: 30px; }
+
+  .xp-result { padding: 14px 16px; margin-top: 14px; }
+  .xp-result-nivel { font-size: 14px; }
+  .xp-gained-tag { font-size: 13px; }
+  .xp-result-bar-track { height: 10px; }
+  .xp-levelup-banner { font-size: 12.5px; padding: 9px 10px; }
+
+  .progresso-popover {
+    left: 0;
+    right: 0;
+    width: auto;
+  }
+  .progresso-nivel-num { font-size: 13px; }
+  .progresso-nivel-titulo { font-size: 11px; }
+  .progresso-xp-atual, .progresso-xp-faltam { font-size: 11px; }
+}
+
+@media (max-width: 480px) {
+  .guia-prova-item-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+  }
+  .fun-fact-card { padding: 14px 14px; }
+  .progresso-card-top, .progresso-card-bottom {
+    flex-wrap: wrap;
+  }
+}
