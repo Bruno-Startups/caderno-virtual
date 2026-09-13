@@ -734,7 +734,7 @@ function renderProgressoSidebar(totalXp, { animarDe = null, forcarGlow = false }
   progressoCard.hidden = false;
   progressoNivelNumEl.textContent = `Nível ${info.level}`;
   progressoNivelTituloEl.textContent = tituloDoNivel(info.level);
-  progressoXpFaltamEl.textContent = `${(info.neededXp - info.currentXp).toLocaleString('pt-BR')} XP para o próximo nível`;
+  progressoXpFaltamEl.textContent = `${(info.neededXp - info.currentXp).toLocaleString('pt-BR')} XP restantes`;
 
   const pct = Math.min(100, (info.currentXp / info.neededXp) * 100);
 
