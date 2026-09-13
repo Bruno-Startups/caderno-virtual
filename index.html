@@ -369,8 +369,10 @@
           <h2>Entrar</h2>
           <input type="email" id="login-email" placeholder="Email" />
           <div class="auth-password-wrap">
-            <input type="password" id="login-senha" placeholder="Senha" />
-            <button type="button" class="auth-toggle-senha" onclick="alternarSenha('login-senha', this)" aria-label="Mostrar senha">👁</button>
+            <button type="button" class="auth-eye" id="login-eye" onclick="alternarSenha('login-senha', 'login-eye')" aria-label="Mostrar senha">
+              <svg viewBox="0 0 40 24"><path class="eye-outline" d="M2 12C7 4 15 1 20 1s13 3 18 11c-5 8-13 11-18 11S7 20 2 12Z" fill="none" stroke="#1f66b2" stroke-width="1.6"/><circle class="eye-pupil" cx="20" cy="12" r="5" fill="#1f66b2"/><rect class="eye-lid" x="0" y="0" width="40" height="12" fill="#fff"/></svg>
+            </button>
+            <input type="password" id="login-senha" placeholder="Senha" oninput="piscarOlho('login-eye')" />
           </div>
           <button type="button" onclick="handleLogin()">Entrar</button>
           <p><a href="#" onclick="handleRecuperarSenha(); return false;">Esqueci minha senha</a></p>
@@ -382,8 +384,10 @@
           <h2>Criar conta</h2>
           <input type="email" id="cadastro-email" placeholder="Email" />
           <div class="auth-password-wrap">
-            <input type="password" id="cadastro-senha" placeholder="Senha (mín. 6 caracteres)" />
-            <button type="button" class="auth-toggle-senha" onclick="alternarSenha('cadastro-senha', this)" aria-label="Mostrar senha">👁</button>
+            <button type="button" class="auth-eye" id="cadastro-eye" onclick="alternarSenha('cadastro-senha', 'cadastro-eye')" aria-label="Mostrar senha">
+              <svg viewBox="0 0 40 24"><path class="eye-outline" d="M2 12C7 4 15 1 20 1s13 3 18 11c-5 8-13 11-18 11S7 20 2 12Z" fill="none" stroke="#1f66b2" stroke-width="1.6"/><circle class="eye-pupil" cx="20" cy="12" r="5" fill="#1f66b2"/><rect class="eye-lid" x="0" y="0" width="40" height="12" fill="#fff"/></svg>
+            </button>
+            <input type="password" id="cadastro-senha" placeholder="Senha (mín. 6 caracteres)" oninput="piscarOlho('cadastro-eye')" />
           </div>
           <button type="button" onclick="handleCadastro()">Cadastrar</button>
           <p>Já tem conta? <a href="#" onclick="trocarAba('login'); return false;">Entrar</a></p>
@@ -405,12 +409,22 @@
         overlay.classList.remove("aberto");
         setTimeout(() => { overlay.style.display = "none"; }, 200);
       }
-      function alternarSenha(inputId, botao) {
+      function alternarSenha(inputId, olhoId) {
         const input = document.getElementById(inputId);
+        const olho = document.getElementById(olhoId);
         const visivel = input.type === "text";
         input.type = visivel ? "password" : "text";
-        botao.textContent = visivel ? "👁" : "🙈";
-        botao.setAttribute("aria-label", visivel ? "Mostrar senha" : "Ocultar senha");
+        if (olho) {
+          olho.classList.toggle("olho-aberto", !visivel);
+          olho.setAttribute("aria-label", visivel ? "Mostrar senha" : "Ocultar senha");
+        }
+      }
+      function piscarOlho(olhoId) {
+        const olho = document.getElementById(olhoId);
+        if (!olho || olho.classList.contains("olho-aberto")) return;
+        olho.classList.add("piscando");
+        clearTimeout(olho._timer);
+        olho._timer = setTimeout(() => olho.classList.remove("piscando"), 220);
       }
       function trocarAba(aba) {
         document.getElementById("modal-auth-login").style.display = aba === "login" ? "block" : "none";
