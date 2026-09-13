@@ -351,21 +351,19 @@ body.maintab-simulados .hero-subjects { display:none; }
 @media (min-width: 960px) {
   .content { width: min(1080px, 100%); }
 
-  .answer-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "summary explanation"
-      "mindmap mindmap"
-      "images images";
+  .answer-top-row {
+    display: flex;
+    align-items: stretch;
     gap: 20px;
-    align-items: start;
-    grid-auto-rows: min-content;
   }
-  .summary-block { grid-area: summary; margin: 0 !important; align-self: start !important; height: max-content !important; }
-  .explanation-block { grid-area: explanation; margin: 0 !important; align-self: start !important; height: max-content !important; }
-  .mindmap-block { grid-area: mindmap; margin: 0; }
-  .images-block { grid-area: images; margin: 0; }
+  .answer-top-row > .summary-block,
+  .answer-top-row > .explanation-block {
+    flex: 1;
+    margin: 0 !important;
+    display: flex;
+    flex-direction: column;
+  }
+  .mindmap-block, .images-block { margin-top: 20px; }
 
   .summary-block,
   .explanation-block,
