@@ -150,6 +150,79 @@ async function parseJsonResponse(response) {
   return response.json();
 }
 
+/* ===== Sincronização com a conta (Supabase) =====
+   Quando o usuário está logado (usuarioAtual definido em auth.js), cada item novo
+   também é enviado pra nuvem. Ao logar em outro aparelho, o histórico do banco é
+   baixado e mesclado com o que já existe no localStorage daquele aparelho. */
+
+function estaLogado() {
+  return typeof usuarioAtual !== 'undefined' && usuarioAtual;
+}
+
+function sincronizarEstudoNaNuvem(item) {
+  if (!estaLogado() || typeof salvarNoHistorico !== 'function') return;
+  salvarNoHistorico(item.subject, item.topic, 'estudo', item).catch((error) => {
+    console.warn('Não foi possível sincronizar o estudo com a conta:', error);
+  });
+}
+
+function sincronizarQuizNaNuvem(record) {
+  if (!estaLogado() || typeof salvarNoHistorico !== 'function') return;
+  salvarNoHistorico(record.subject, record.topic, 'questao', record).catch((error) => {
+    console.warn('Não foi possível sincronizar o simulado com a conta:', error);
+  });
+}
+
+async function baixarHistoricoDaNuvem() {
+  if (!estaLogado() || typeof carregarHistoricoDoBanco !== 'function') return;
+  try {
+    const registros = await carregarHistoricoDoBanco();
+    if (!Array.isArray(registros) || registros.length === 0) return;
+
+    const estudoHistory = getHistory();
+    const quizHistoryAtual = getQuizHistory();
+    let estudoMudou = false;
+    let quizMudou = false;
+
+    registros.forEach((registro) => {
+      if (registro.tipo === 'estudo') {
+        const item = registro.dados;
+        if (!item || !item.subject || !item.topic) return;
+        if (!estudoHistory[item.subject]) estudoHistory[item.subject] = [];
+        const normalizedNew = normalizeTopic(item.topic);
+        const jaExiste = estudoHistory[item.subject].some((saved) => normalizeTopic(saved.topic) === normalizedNew);
+        if (!jaExiste) {
+          estudoHistory[item.subject].unshift(item);
+          estudoMudou = true;
+        }
+      } else if (registro.tipo === 'questao') {
+        const record = registro.dados;
+        if (!record) return;
+        const jaExiste = quizHistoryAtual.some((saved) => saved.statement === record.statement && saved.date === record.date);
+        if (!jaExiste) {
+          quizHistoryAtual.push(record);
+          quizMudou = true;
+        }
+      }
+    });
+
+    if (estudoMudou) {
+      Object.keys(estudoHistory).forEach((subject) => { estudoHistory[subject] = estudoHistory[subject].slice(0, 15); });
+      localStorage.setItem(storageKey, JSON.stringify(estudoHistory));
+    }
+    if (quizMudou) {
+      quizHistoryAtual.sort((a, b) => new Date(b.date) - new Date(a.date));
+      localStorage.setItem(quizStorageKey, JSON.stringify(quizHistoryAtual.slice(0, 300)));
+    }
+
+    const activePane = document.querySelector('.main-tab.active')?.dataset.maintab;
+    if (activePane === 'simulados') renderQuizSidebarHistory(); else renderHistory();
+  } catch (error) {
+    console.warn('Não foi possível baixar o histórico da conta:', error);
+  }
+}
+window.baixarHistoricoDaNuvem = baixarHistoricoDaNuvem;
+
 function getHistory() { try { return JSON.parse(localStorage.getItem(storageKey)) || {}; } catch { return {}; } }
 function saveHistory(history) {
   try {
@@ -176,6 +249,7 @@ function addToHistory(item) {
   history[item.subject].unshift(item);
   history[item.subject] = history[item.subject].slice(0, 15);
   saveHistory(history);
+  sincronizarEstudoNaNuvem(item);
 }
 
 function deleteHistoryItem(subject, topic) {
@@ -625,6 +699,7 @@ function saveQuizRecord(record) {
   } catch (error) {
     console.warn('Não foi possível salvar o histórico de simulados:', error);
   }
+  sincronizarQuizNaNuvem(record);
 }
 
 function getPastQuestionsForSubject(subject) {

@@ -30,7 +30,7 @@ function atualizarUI() {
     areaDeslogado.style.display = "none";
     const nomeEl = document.getElementById("nome-usuario");
     if (nomeEl) nomeEl.textContent = usuarioAtual.email;
-    if (typeof carregarHistoricoDoBanco === "function") carregarHistoricoDoBanco();
+    if (typeof baixarHistoricoDaNuvem === "function") baixarHistoricoDaNuvem();
   } else {
     areaLogado.style.display = "none";
     areaDeslogado.style.display = "flex";
