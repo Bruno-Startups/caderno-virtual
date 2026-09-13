@@ -298,17 +298,23 @@ body.maintab-simulados .hero-subjects { display:none; }
 
 .auth-password-wrap {
   position: relative;
-  padding-top: 34px;
+  padding-top: 30px;
+}
+
+.auth-password-wrap input {
+  position: relative;
+  z-index: 1;
 }
 
 .auth-eye {
   position: absolute;
-  top: -4px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 46px;
-  height: 28px;
+  width: 44px;
+  height: 24px;
   pointer-events: none;
+  z-index: 0;
 }
 
 .auth-eye svg {
@@ -343,26 +349,25 @@ body.maintab-simulados .hero-subjects { display:none; }
 
 .auth-toggle-senha {
   position: absolute;
-  right: 4px;
-  top: 4px;
-  bottom: 14px;
-  width: 38px;
+  top: 30px;
+  right: 0;
+  height: 44px;
+  width: 42px;
   margin: 0 !important;
   padding: 0 !important;
   background: transparent !important;
   border: none !important;
-  border-left: 1px solid #e4e9f0 !important;
   cursor: pointer;
   font-size: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #667 !important;
-  border-radius: 0 8px 8px 0 !important;
+  z-index: 2;
 }
 
 .auth-toggle-senha:hover {
-  background: #f1f4f8 !important;
+  color: #1f66b2 !important;
 }
 
 .modal-auth-fechar {
