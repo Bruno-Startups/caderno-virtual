@@ -13,6 +13,8 @@ const answer = document.querySelector('#answer');
 const answerTitle = document.querySelector('#answer-title');
 const answerMeta = document.querySelector('#answer-meta');
 const summaryList = document.querySelector('#summary-list');
+const funFactCard = document.querySelector('#fun-fact');
+const funFactText = document.querySelector('#fun-fact-text');
 const explanationContent = document.querySelector('#explanation-content');
 const imagesGrid = document.querySelector('#images-grid');
 const imagesEmpty = document.querySelector('#images-empty');
@@ -465,6 +467,12 @@ function showAnswer(item, shouldScroll = true) {
   answerTitle.textContent = item.topic;
   answerMeta.textContent = item.schoolYear ? `${item.subject} · ${item.schoolYear}` : item.subject;
   summaryList.innerHTML = item.summary.map((line) => `<li>${bold(line)}</li>`).join('');
+  if (item.funFact) {
+    funFactText.textContent = item.funFact;
+    funFactCard.hidden = false;
+  } else {
+    funFactCard.hidden = true;
+  }
   const palette = SUBJECT_COLORS[item.subject] || SUBJECT_COLORS['Matemática'];
   renderMindMap(item.topic, item.keywords, palette.color, palette.soft);
   explanationContent.innerHTML = renderExplanation(item.explanation);
@@ -506,7 +514,7 @@ form.addEventListener('submit', async (event) => {
     updateActivePill(wasAutoDetected);
     renderTopicChips(finalSubject);
 
-    const item = { subject: finalSubject, schoolYear, topic: data.topic || topic, summary: data.summary, keywords: data.keywords, explanation: data.explanation, images };
+    const item = { subject: finalSubject, schoolYear, topic: data.topic || topic, summary: data.summary, keywords: data.keywords, funFact: data.funFact, explanation: data.explanation, images };
     addToHistory(item);
     showAnswer(item);
   } catch (error) {
