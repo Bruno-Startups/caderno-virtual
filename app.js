@@ -686,11 +686,12 @@ async function processarXpDoSimulado() {
     return;
   }
 
-  const total = quizState.correct + quizState.wrong;
-  const resultado = await enviarResultadoSimulado(quizState.attemptId, quizState.correct, total);
-  if (!resultado) { xpResultEl.hidden = true; return; }
+  try {
+    const total = quizState.correct + quizState.wrong;
+    const resultado = await enviarResultadoSimulado(quizState.attemptId, quizState.correct, total);
+    if (!resultado) { xpResultEl.hidden = true; return; }
 
-  xpResultEl.hidden = false;
+    xpResultEl.hidden = false;
   xpLevelupBanner.hidden = true;
   xpGainedTagEl.textContent = `+${resultado.xpAwarded} XP`;
   xpGainedTagEl.classList.remove('xp-gained-pop');
@@ -733,6 +734,10 @@ async function processarXpDoSimulado() {
   }
 
   renderProgressoSidebar(resultado.totalXp);
+  } catch (error) {
+    console.warn('Falha ao processar XP do simulado:', error);
+    xpResultEl.hidden = true;
+  }
 }
 
 const quizStorageKey = 'caderno-virtual-questoes-v1';
@@ -933,6 +938,7 @@ quizSetupForm.addEventListener('submit', async (event) => {
   quizSetupForm.hidden = true;
   quizSummary.hidden = true;
   quizActive.hidden = false;
+  if (xpResultEl) { xpResultEl.hidden = true; xpLevelupBanner.hidden = true; }
   await loadQuizQuestion();
 });
 
