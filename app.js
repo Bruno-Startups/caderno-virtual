@@ -635,7 +635,7 @@ safeRun('render-history', renderHistory);
    O servidor (/api/finish-quiz) é a única fonte que grava XP — o frontend só exibe. */
 
 function needForLevel(level) {
-  return Math.round(100 * Math.pow(level, 1.5));
+  return Math.round(120 * Math.pow(level, 1.6));
 }
 
 function computeLevel(totalXp) {
