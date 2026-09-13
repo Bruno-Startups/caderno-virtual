@@ -380,36 +380,43 @@ body.maintab-simulados .hero-subjects { display:none; }
 }
 
 /* ===== Dica rápida / curiosidade ===== */
+.summary-block {
+  display: flex;
+  flex-direction: column;
+}
+
 .fun-fact-card {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 14px;
   margin-top: 18px;
-  padding: 16px 18px;
+  padding: 22px 22px;
   border-radius: 12px;
   background: linear-gradient(135deg, var(--blue-soft, #eaf3ff) 0%, #fff 100%);
   border: 1.5px solid var(--blue);
   position: relative;
   z-index: 1;
+  flex: 1;
+  min-height: 90px;
   animation: funFactPop 0.4s ease both;
 }
 
 .fun-fact-icon {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: var(--blue);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 20px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 .fun-fact-label {
-  margin: 0 0 4px;
-  font-size: 11px;
+  margin: 0 0 6px;
+  font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -418,8 +425,8 @@ body.maintab-simulados .hero-subjects { display:none; }
 
 .fun-fact-card p#fun-fact-text {
   margin: 0;
-  font-size: 14.5px;
-  line-height: 1.55;
+  font-size: 16px;
+  line-height: 1.6;
   color: #243a55;
   font-weight: 600;
 }

@@ -468,7 +468,7 @@ function showAnswer(item, shouldScroll = true) {
   answerMeta.textContent = item.schoolYear ? `${item.subject} · ${item.schoolYear}` : item.subject;
   summaryList.innerHTML = item.summary.map((line) => `<li>${bold(line)}</li>`).join('');
   if (item.funFact) {
-    funFactText.textContent = item.funFact;
+    funFactText.innerHTML = bold(item.funFact);
     funFactCard.hidden = false;
   } else {
     funFactCard.hidden = true;
