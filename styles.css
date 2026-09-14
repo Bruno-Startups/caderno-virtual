@@ -1624,19 +1624,19 @@ body.maintab-provas #hero-subjects { display: none; }
   width: 34px;
   height: 34px;
   padding: 0;
-  border: 1px solid #e3e9f1;
+  border: 1px solid #f0c4c4;
   border-radius: 10px;
-  background: #f6f9fc;
-  color: #8298b4;
+  background: #fdecec;
+  color: #b6424e;
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
   transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 .prova-card-x:hover {
-  background: #fdecec;
-  border-color: #f0c4c4;
-  color: #b6424e;
+  background: #b6424e;
+  border-color: #b6424e;
+  color: #fff;
 }
 .prova-passada .prova-card-x {
   width: 26px;
