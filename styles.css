@@ -1678,3 +1678,48 @@ body.maintab-provas #hero-subjects { display: none; }
 @media (max-width: 560px) {
   .main-tab { justify-content: flex-start; }
 }
+
+
+/* ===== Intro: capa abrindo + folheado ===== */
+.intro-notebook { width: 168px; height: auto; overflow: visible; }
+
+.intro-cover {
+  transform-origin: 30px 124px;
+  animation: intro-folha 0.75s cubic-bezier(0.45, 0, 0.3, 1) 0.3s both;
+}
+.intro-page {
+  transform-origin: 30px 124px;
+  animation: intro-folha 0.5s cubic-bezier(0.45, 0, 0.3, 1) both;
+}
+.intro-page-1 { animation-delay: 0.85s; }
+.intro-page-2 { animation-delay: 1.05s; }
+.intro-page-3 { animation-delay: 1.25s; }
+
+@keyframes intro-folha {
+  0%   { transform: scaleX(1); opacity: 1; }
+  70%  { transform: scaleX(-0.12); opacity: 0.85; }
+  100% { transform: scaleX(-0.12); opacity: 0; }
+}
+
+.intro-spiral { animation: intro-espiral 0.5s ease-out 0.2s both; }
+@keyframes intro-espiral {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.intro-greeting {
+  margin: 2px 0 0;
+  color: #6e8fb4;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  opacity: 0;
+  animation: intro-caption-fade 0.45s ease-out 1.7s forwards;
+}
+.intro-greeting span { color: #ffca5c; font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-cover, .intro-page { animation: none; opacity: 0; }
+  .intro-spiral { animation: none; opacity: 1; }
+  .intro-greeting { animation: none; opacity: 1; }
+}
