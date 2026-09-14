@@ -1664,13 +1664,13 @@ body.maintab-provas #hero-subjects { display: none; }
 .main-tab[data-maintab="provas"]    { --tab-etiqueta: #5b3fd6; }
 
 .main-tab.active {
-  background: color-mix(in srgb, var(--tab-etiqueta, var(--blue)) 14%, #fff);
-  border-color: color-mix(in srgb, var(--tab-etiqueta, var(--blue)) 45%, #fff);
-  color: color-mix(in srgb, var(--tab-etiqueta, var(--blue)) 78%, #000);
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--tab-etiqueta, var(--blue)) 18%, transparent);
+  background: color-mix(in srgb, var(--blue) 14%, #fff);
+  border-color: color-mix(in srgb, var(--blue) 45%, #fff);
+  color: color-mix(in srgb, var(--blue) 78%, #000);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--blue) 18%, transparent);
 }
 .main-tab.active::before {
-  background: var(--tab-etiqueta, var(--blue));
+  background: var(--blue);
   box-shadow: none;
 }
 
