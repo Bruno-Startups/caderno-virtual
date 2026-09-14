@@ -1663,9 +1663,15 @@ body.maintab-provas #hero-subjects { display: none; }
 .main-tab[data-maintab="simulados"] { --tab-etiqueta: #d99206; }
 .main-tab[data-maintab="provas"]    { --tab-etiqueta: #5b3fd6; }
 
+.main-tab.active {
+  background: color-mix(in srgb, var(--tab-etiqueta, var(--blue)) 14%, #fff);
+  border-color: color-mix(in srgb, var(--tab-etiqueta, var(--blue)) 45%, #fff);
+  color: color-mix(in srgb, var(--tab-etiqueta, var(--blue)) 78%, #000);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--tab-etiqueta, var(--blue)) 18%, transparent);
+}
 .main-tab.active::before {
-  background: color-mix(in srgb, var(--tab-etiqueta, var(--blue)) 55%, #000);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.22);
+  background: var(--tab-etiqueta, var(--blue));
+  box-shadow: none;
 }
 
 @media (max-width: 560px) {
