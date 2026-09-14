@@ -1681,45 +1681,52 @@ body.maintab-provas #hero-subjects { display: none; }
 
 
 /* ===== Intro: capa abrindo + folheado ===== */
-.intro-notebook { width: 168px; height: auto; overflow: visible; }
+.intro-overlay {
+  animation: intro-fade-out 0.6s ease-in 3.55s forwards;
+}
+.intro-notebook { width: 176px; height: auto; overflow: visible; }
+
+.intro-spiral { animation: intro-espiral 0.5s ease-out 0.15s both; }
+@keyframes intro-espiral { from { opacity: 0; } to { opacity: 1; } }
 
 .intro-cover {
   transform-origin: 30px 124px;
-  animation: intro-folha 0.75s cubic-bezier(0.45, 0, 0.3, 1) 0.3s both;
+  animation: intro-abre-capa 1s cubic-bezier(0.5, 0, 0.35, 1) 0.5s both;
 }
+@keyframes intro-abre-capa {
+  0%   { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}
+
 .intro-page {
   transform-origin: 30px 124px;
-  animation: intro-folha 0.5s cubic-bezier(0.45, 0, 0.3, 1) both;
+  animation: intro-folha 0.62s cubic-bezier(0.55, 0, 0.4, 1) both;
 }
-.intro-page-1 { animation-delay: 0.85s; }
-.intro-page-2 { animation-delay: 1.05s; }
-.intro-page-3 { animation-delay: 1.25s; }
+.intro-page-1 { animation-delay: 1.55s; }
+.intro-page-2 { animation-delay: 1.95s; }
+.intro-page-3 { animation-delay: 2.35s; }
 
 @keyframes intro-folha {
   0%   { transform: scaleX(1); opacity: 1; }
-  70%  { transform: scaleX(-0.12); opacity: 0.85; }
-  100% { transform: scaleX(-0.12); opacity: 0; }
+  99%  { transform: scaleX(0.02); opacity: 1; }
+  100% { transform: scaleX(0); opacity: 0; }
 }
 
-.intro-spiral { animation: intro-espiral 0.5s ease-out 0.2s both; }
-@keyframes intro-espiral {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
+.intro-caption { animation: intro-caption-fade 0.5s ease-out 2.6s forwards; }
 
 .intro-greeting {
-  margin: 2px 0 0;
+  margin: 4px 0 0;
   color: #6e8fb4;
   font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.01em;
   opacity: 0;
-  animation: intro-caption-fade 0.45s ease-out 1.7s forwards;
+  animation: intro-caption-fade 0.5s ease-out 2.9s forwards;
 }
 .intro-greeting span { color: #ffca5c; font-weight: 700; }
 
 @media (prefers-reduced-motion: reduce) {
-  .intro-cover, .intro-page { animation: none; opacity: 0; }
+  .intro-overlay { animation: intro-fade-out 0.3s ease-in 0.4s forwards; }
+  .intro-cover, .intro-page { animation: none; transform: scaleX(0); }
   .intro-spiral { animation: none; opacity: 1; }
-  .intro-greeting { animation: none; opacity: 1; }
+  .intro-caption, .intro-greeting { animation: none; opacity: 1; }
 }
