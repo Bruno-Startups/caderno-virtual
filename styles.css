@@ -1519,40 +1519,101 @@ body.maintab-simulados .hero-subjects { display:none; }
   border-color: #2f9e6a;
 }
 
-/* ===== Modo Prova: barra lateral e aba ===== */
+/* ===== Modo Prova: barra lateral ("Pra hoje") ===== */
 body.maintab-provas #hero-subjects { display: none; }
 
-.prova-sidebar-item {
-  display: flex;
-  align-items: stretch;
-  gap: 4px;
-  border: 1px solid #e3e9f1;
-  border-left: 3px solid var(--tab-color, var(--blue));
-  border-radius: 10px;
-  background: #fff;
-  margin-bottom: 8px;
-  padding: 0;
-  overflow: hidden;
-  transition: background 0.18s ease;
+.prova-lateral-contagem {
+  display: block;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 3px solid var(--tab-color, #5e7da1);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 14px 14px 12px;
+  margin-bottom: 18px;
 }
-.prova-sidebar-item:hover { background: #f6f9fc; }
-.prova-sidebar-ativa {
-  background: #f2f6fb;
-  border-color: var(--tab-color, var(--blue));
+.prova-lateral-num {
+  display: block;
+  font-family: Georgia, serif;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
 }
-.prova-sidebar-abrir {
-  flex: 1;
-  min-width: 0;
+.prova-lateral-rotulo {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--tab-color, #9ab9d7);
+}
+.prova-lateral-prova {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #adc0d7;
+}
+
+.prova-lateral-titulo {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #9ab9d7;
+}
+
+.prova-lateral-item {
+  display: block;
+  width: 100%;
   text-align: left;
-  background: none;
-  border: 0;
-  padding: 11px 4px 11px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid var(--tab-color, #5e7da1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px 12px;
+  margin-bottom: 6px;
   font: inherit;
   cursor: pointer;
-  color: inherit;
+  transition: background 0.18s ease;
 }
-.prova-sidebar-x {
-  flex-shrink: 0;
-  align-self: center;
-  margin-right: 6px;
+.prova-lateral-item:hover { background: rgba(255, 255, 255, 0.1); }
+.prova-lateral-topico {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f3f8ff;
 }
+.prova-lateral-meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: #9ab9d7;
+}
+
+.prova-lateral-zerado {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: #adc0d7;
+}
+
+.prova-lateral-todas {
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  background: transparent;
+  color: #dbeeff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+.prova-lateral-todas:hover { background: rgba(255, 255, 255, 0.09); }

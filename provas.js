@@ -524,49 +524,83 @@
     }).observe(quizSummaryEl, { attributes: true, attributeFilter: ['hidden'] });
   }
 
-  // ---------- sidebar ----------
+  // ---------- barra lateral: painel "Pra hoje" ----------
   function renderSidebar() {
     if (!logado()) {
       historyList.innerHTML = '<p class="empty-history">Entre na sua conta pra cadastrar provas.</p>';
       return;
     }
-    if (provasCache.length === 0) {
-      historyList.innerHTML = '<p class="empty-history">Suas provas cadastradas vão aparecer aqui.</p>';
+
+    const ativas = provasCache
+      .filter((p) => diffDias(hojeLocal(), parseData(p.data_prova)) >= 0)
+      .sort((a, b) => a.data_prova.localeCompare(b.data_prova));
+
+    if (ativas.length === 0) {
+      historyList.innerHTML = '<p class="empty-history">Cadastre uma prova pra ver seu plano do dia aqui.</p>';
       return;
     }
-    historyList.innerHTML = provasCache.map((prova) => {
-      const palette = corDaMateria(prova.materia);
-      const dias = diffDias(hojeLocal(), parseData(prova.data_prova));
-      const label = dias < 0 ? 'encerrada' : dias === 0 ? 'hoje' : `${dias}d`;
-      const ativa = prova.id === provaAbertaId ? ' prova-sidebar-ativa' : '';
-      return `
-        <div class="prova-sidebar-item${ativa}" style="--tab-color:${palette.color}">
-          <button type="button" class="prova-sidebar-abrir" data-prova="${prova.id}">
-            <span class="prova-sidebar-titulo">${escapeHtml(prova.titulo || 'Prova')}</span>
-            <span class="prova-sidebar-meta">${escapeHtml(prova.materia || '')} · ${label}</span>
-          </button>
-          <button type="button" class="icon-button prova-sidebar-x" data-apagar-prova="${prova.id}" aria-label="Apagar prova">×</button>
-        </div>`;
-    }).join('');
+
+    // contagem regressiva da prova mais próxima
+    const proxima = ativas[0];
+    const dias = diffDias(hojeLocal(), parseData(proxima.data_prova));
+    const palette = corDaMateria(proxima.materia);
+    const numero = dias === 0 ? 'Hoje' : dias;
+    const rotulo = dias === 0 ? 'é o dia da prova' : dias === 1 ? 'dia restante' : 'dias restantes';
+
+    const contagemHtml = `
+      <div class="prova-lateral-contagem" style="--tab-color:${palette.color}">
+        <span class="prova-lateral-num">${numero}</span>
+        <span class="prova-lateral-rotulo">${rotulo}</span>
+        <span class="prova-lateral-prova">${escapeHtml(proxima.titulo || 'Prova')}</span>
+      </div>`;
+
+    // etapas de hoje, de todas as provas
+    const pendentesHoje = [];
+    ativas.forEach((prova) => {
+      const cron = montarCronograma(prova);
+      const bloco = cron.blocos.find((b) => b.offset === 0);
+      if (!bloco) return;
+      const concluidos = Array.isArray(prova.concluidos) ? prova.concluidos : [];
+      bloco.itens.forEach((item) => {
+        if (itemCompleto(item, concluidos)) return;
+        const faltam = subKeys(item).filter((k) => !concluidos.includes(k)).length;
+        pendentesHoje.push({ prova, item, faltam });
+      });
+    });
+
+    const ROTULO = { estudo: 'Estudar', revisao: 'Revisar', simulado: 'Simulado final' };
+
+    const listaHtml = pendentesHoje.length === 0
+      ? '<p class="prova-lateral-zerado">Tudo de hoje está feito. 🎉</p>'
+      : pendentesHoje.map(({ prova, item, faltam }) => {
+          const cor = corDaMateria(prova.materia).color;
+          return `
+            <button type="button" class="prova-lateral-item" data-prova="${prova.id}" style="--tab-color:${cor}">
+              <span class="prova-lateral-topico">${escapeHtml(item.topico)}</span>
+              <span class="prova-lateral-meta">${ROTULO[item.tipo]} · ${faltam} etapa${faltam === 1 ? '' : 's'}</span>
+            </button>`;
+        }).join('');
+
+    historyList.innerHTML = `
+      ${contagemHtml}
+      <p class="prova-lateral-titulo">Pra hoje</p>
+      ${listaHtml}
+      <button type="button" class="prova-lateral-todas" id="prova-lateral-todas">Ver todas as provas</button>`;
+
     historyList.querySelectorAll('[data-prova]').forEach((b) => {
       b.addEventListener('click', () => abrirProva(b.dataset.prova));
     });
-    historyList.querySelectorAll('[data-apagar-prova]').forEach((b) => {
-      b.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        if (!confirm('Apagar esta prova?')) return;
-        const id = b.dataset.apagarProva;
-        await apagarProva(id);
-        if (provaAbertaId === id) provaAbertaId = null;
-        renderSidebar();
-        if (provaAbertaId) abrirProva(provaAbertaId); else renderLista();
-      });
+    historyList.querySelector('#prova-lateral-todas')?.addEventListener('click', () => {
+      provaAbertaId = null;
+      renderLista();
+      renderSidebar();
     });
   }
 
   // ---------- entrada na aba ----------
   async function entrarNaAba() {
-    document.querySelector('#history-caption').textContent = 'Suas provas cadastradas, salvas na sua conta.';
+    document.querySelector('#history-caption').textContent = 'O que você precisa fazer hoje.';
+    document.querySelector('.history-title').innerHTML = '<span class="history-title-icon" aria-hidden="true">📅</span> Seu plano';
     clearHistory.hidden = true;
 
     if (!logado()) {
@@ -605,6 +639,8 @@
   window.setMainTab = function (name) {
     if (name !== 'provas') {
       document.body.classList.remove('maintab-provas');
+      const titulo = document.querySelector('.history-title');
+      if (titulo) titulo.innerHTML = '<span class="history-title-icon" aria-hidden="true">🕘</span> Seu histórico';
       return setMainTabOriginal(name);
     }
     document.querySelectorAll('.main-tab').forEach((tab) => {
