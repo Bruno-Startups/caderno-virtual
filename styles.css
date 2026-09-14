@@ -1682,16 +1682,17 @@ body.maintab-provas #hero-subjects { display: none; }
 
 /* ===== Intro: capa abrindo + folheado ===== */
 .intro-overlay {
-  animation: intro-fade-out 0.6s ease-in 3.55s forwards;
+  gap: 14px;
+  animation: intro-fade-out 0.5s ease-in 2.4s forwards;
 }
-.intro-notebook { width: 176px; height: auto; overflow: visible; }
+.intro-notebook { width: 168px; height: auto; overflow: visible; }
 
-.intro-spiral { animation: intro-espiral 0.5s ease-out 0.15s both; }
+.intro-spiral { animation: intro-espiral 0.4s ease-out 0.1s both; }
 @keyframes intro-espiral { from { opacity: 0; } to { opacity: 1; } }
 
 .intro-cover {
   transform-origin: 30px 124px;
-  animation: intro-abre-capa 1s cubic-bezier(0.5, 0, 0.35, 1) 0.5s both;
+  animation: intro-abre-capa 0.8s cubic-bezier(0.5, 0, 0.35, 1) 0.35s both;
 }
 @keyframes intro-abre-capa {
   0%   { transform: scaleX(1); }
@@ -1700,11 +1701,11 @@ body.maintab-provas #hero-subjects { display: none; }
 
 .intro-page {
   transform-origin: 30px 124px;
-  animation: intro-folha 0.62s cubic-bezier(0.55, 0, 0.4, 1) both;
+  animation: intro-folha 0.5s cubic-bezier(0.55, 0, 0.4, 1) both;
 }
-.intro-page-1 { animation-delay: 1.55s; }
-.intro-page-2 { animation-delay: 1.95s; }
-.intro-page-3 { animation-delay: 2.35s; }
+.intro-page-1 { animation-delay: 1.2s; }
+.intro-page-2 { animation-delay: 1.5s; }
+.intro-page-3 { animation-delay: 1.8s; }
 
 @keyframes intro-folha {
   0%   { transform: scaleX(1); opacity: 1; }
@@ -1712,21 +1713,45 @@ body.maintab-provas #hero-subjects { display: none; }
   100% { transform: scaleX(0); opacity: 0; }
 }
 
-.intro-caption { animation: intro-caption-fade 0.5s ease-out 2.6s forwards; }
-
-.intro-greeting {
-  margin: 4px 0 0;
-  color: #6e8fb4;
-  font-size: 13px;
-  font-weight: 500;
+/* legenda embaixo, visível desde o começo */
+.intro-caption {
   opacity: 0;
-  animation: intro-caption-fade 0.5s ease-out 2.9s forwards;
+  animation: intro-caption-fade 0.45s ease-out 0.3s forwards;
 }
-.intro-greeting span { color: #ffca5c; font-weight: 700; }
+
+/* saudação grande, acima do caderno */
+.intro-greeting {
+  margin: 0 0 4px;
+  max-width: 320px;
+  text-align: center;
+  font-family: Georgia, serif;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  opacity: 0;
+  animation: intro-sobe 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.45s forwards;
+}
+.intro-greeting span {
+  display: block;
+  margin-top: 6px;
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #ffca5c;
+  word-break: break-all;
+}
+
+@keyframes intro-sobe {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .intro-overlay { animation: intro-fade-out 0.3s ease-in 0.4s forwards; }
   .intro-cover, .intro-page { animation: none; transform: scaleX(0); }
   .intro-spiral { animation: none; opacity: 1; }
-  .intro-caption, .intro-greeting { animation: none; opacity: 1; }
+  .intro-caption, .intro-greeting { animation: none; opacity: 1; transform: none; }
 }
