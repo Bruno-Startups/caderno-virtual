@@ -1382,8 +1382,7 @@ body.maintab-simulados .hero-subjects { display:none; }
   transition: opacity 0.25s ease, background 0.25s ease;
 }
 .prova-item-feito {
-  opacity: 0.55;
-  background: #f8fafc;
+  background: #f4fbf7;
 }
 .prova-item-feito .prova-item-topico {
   text-decoration: line-through;
@@ -1496,4 +1495,26 @@ body.maintab-simulados .hero-subjects { display:none; }
   .provas-card { padding: 20px 16px; }
   .provas-grid { grid-template-columns: 1fr; }
   .prova-contagem-num { font-size: 1.15rem; }
+}
+
+/* ===== Modo Prova: etapas concluídas ===== */
+.prova-acao-feita {
+  background: #e7f7ef;
+  border-color: #2f9e6a;
+  color: #24774f;
+  cursor: default;
+}
+.prova-acao-feita:hover {
+  background: #d8f0e4;
+  color: #1d5f40;
+}
+
+.prova-item-feito {
+  opacity: 1;
+  background: #f4fbf7;
+  border-color: #cbe9da;
+}
+.prova-item-feito .prova-check {
+  background: #2f9e6a;
+  border-color: #2f9e6a;
 }

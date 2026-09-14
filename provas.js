@@ -83,12 +83,23 @@
     return { dias, encerrada: false, blocos };
   }
 
+  // cada item tem sub-acoes: '#e' (estudar) e '#t' (testar). Simulado so tem '#t'.
+  function subKeys(item) {
+    return item.tipo === 'simulado' ? [item.key + '#t'] : [item.key + '#e', item.key + '#t'];
+  }
+
+  function itemCompleto(item, concluidos) {
+    return subKeys(item).every((k) => concluidos.includes(k));
+  }
+
   function totaisCronograma(cron, concluidos) {
     let total = 0;
     let feitos = 0;
     cron.blocos.forEach((b) => b.itens.forEach((it) => {
-      total += 1;
-      if (concluidos.includes(it.key)) feitos += 1;
+      subKeys(it).forEach((k) => {
+        total += 1;
+        if (concluidos.includes(k)) feitos += 1;
+      });
     }));
     return { total, feitos, percent: total ? Math.round((feitos / total) * 100) : 0 };
   }
@@ -347,14 +358,18 @@
 
     const blocosHtml = cron.blocos.map((bloco, i) => {
       const itens = bloco.itens.map((item) => {
-        const feito = prova.concluidos.includes(item.key);
+        const feitoE = prova.concluidos.includes(item.key + '#e');
+        const feitoT = prova.concluidos.includes(item.key + '#t');
+        const feito = itemCompleto(item, prova.concluidos);
+
         const acoes = item.tipo === 'simulado'
-          ? `<button type="button" class="prova-acao" data-simulado="1">Fazer simulado</button>`
-          : `<button type="button" class="prova-acao" data-estudar="${escapeHtml(item.topico)}">Estudar</button>
-             <button type="button" class="prova-acao" data-testar="${escapeHtml(item.topico)}">Testar</button>`;
+          ? `<button type="button" class="prova-acao ${feitoT ? 'prova-acao-feita' : ''}" data-simulado="1" data-key="${escapeHtml(item.key)}">${feitoT ? '✓ Simulado feito' : 'Fazer simulado'}</button>`
+          : `<button type="button" class="prova-acao ${feitoE ? 'prova-acao-feita' : ''}" data-estudar="${escapeHtml(item.topico)}" data-key="${escapeHtml(item.key)}">${feitoE ? '✓ Estudado' : 'Estudar'}</button>
+             <button type="button" class="prova-acao ${feitoT ? 'prova-acao-feita' : ''}" data-testar="${escapeHtml(item.topico)}" data-key="${escapeHtml(item.key)}">${feitoT ? '✓ Testado' : 'Testar'}</button>`;
+
         return `
           <li class="prova-item ${feito ? 'prova-item-feito' : ''}">
-            <button type="button" class="prova-check" data-key="${escapeHtml(item.key)}" aria-label="Marcar como concluído">${feito ? '✓' : ''}</button>
+            <button type="button" class="prova-check" data-key="${escapeHtml(item.key)}" data-tipo="${item.tipo}" aria-label="Marcar tudo como concluído">${feito ? '✓' : ''}</button>
             <div class="prova-item-corpo">
               <p class="prova-item-topico"><span aria-hidden="true">${ICONE[item.tipo]}</span> ${escapeHtml(item.topico)}</p>
               <p class="prova-item-tipo">${ROTULO[item.tipo]}</p>
@@ -388,7 +403,7 @@
 
         <div class="prova-progresso">
           <div class="prova-progresso-track"><div class="prova-progresso-fill" style="width:${percent}%"></div></div>
-          <span>${feitos} de ${total} concluído${feitos === 1 ? '' : 's'}</span>
+          <span>${feitos} de ${total} etapa${total === 1 ? '' : 's'}</span>
         </div>
 
         ${cron.blocos.length ? blocosHtml : '<p class="provas-empty-copy">Essa prova já passou.</p>'}
@@ -396,32 +411,46 @@
 
     paneProvas.querySelector('#prova-voltar').addEventListener('click', () => { provaAbertaId = null; renderLista(); });
 
+    // marcar/desmarcar tudo pelo quadradinho
     paneProvas.querySelectorAll('.prova-check').forEach((btn) => {
       btn.addEventListener('click', async () => {
-        const key = btn.dataset.key;
-        const idx = prova.concluidos.indexOf(key);
-        if (idx >= 0) prova.concluidos.splice(idx, 1);
-        else prova.concluidos.push(key);
+        const keys = btn.dataset.tipo === 'simulado'
+          ? [btn.dataset.key + '#t']
+          : [btn.dataset.key + '#e', btn.dataset.key + '#t'];
+        const todosFeitos = keys.every((k) => prova.concluidos.includes(k));
+        if (todosFeitos) prova.concluidos = prova.concluidos.filter((k) => !keys.includes(k));
+        else keys.forEach((k) => { if (!prova.concluidos.includes(k)) prova.concluidos.push(k); });
         await salvarConcluidos(prova);
         abrirProva(prova.id);
       });
     });
 
     paneProvas.querySelectorAll('[data-estudar]').forEach((btn) => {
-      btn.addEventListener('click', () => irParaEstudo(btn.dataset.estudar));
+      btn.addEventListener('click', () => {
+        pendente = { provaId: prova.id, subKey: btn.dataset.key + '#e', tipo: 'e' };
+        irParaEstudo(btn.dataset.estudar);
+      });
     });
     paneProvas.querySelectorAll('[data-testar]').forEach((btn) => {
-      btn.addEventListener('click', () => irParaQuiz(btn.dataset.testar, 3));
+      btn.addEventListener('click', () => {
+        pendente = { provaId: prova.id, subKey: btn.dataset.key + '#t', tipo: 't' };
+        irParaQuiz(btn.dataset.testar, 3);
+      });
     });
     const btnSim = paneProvas.querySelector('[data-simulado]');
     if (btnSim) {
-      btnSim.addEventListener('click', () => irParaQuiz((prova.topicos || []).join(', '), 10));
+      btnSim.addEventListener('click', () => {
+        pendente = { provaId: prova.id, subKey: btnSim.dataset.key + '#t', tipo: 't' };
+        irParaQuiz((prova.topicos || []).join(', '), 10);
+      });
     }
   }
 
   // ---------- integração com as outras abas ----------
   function irParaEstudo(topico) {
     setMainTab('estudo');
+    const answerEl = document.querySelector('#answer');
+    if (answerEl) answerEl.hidden = true;
     topicInput.value = topico;
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (form.requestSubmit) form.requestSubmit();
@@ -450,6 +479,44 @@
     const f = document.querySelector('#quiz-setup-form');
     if (f.requestSubmit) f.requestSubmit();
     else f.dispatchEvent(new Event('submit', { cancelable: true }));
+  }
+
+  // ---------- conclusao automatica ----------
+  // Marca a etapa como feita quando o aluno REALMENTE termina:
+  // estudar -> o conteudo aparece na aba Estudar; testar -> chega no resultado do simulado.
+  let pendente = null;
+
+  async function concluirPendente() {
+    if (!pendente) return;
+    const { provaId, subKey } = pendente;
+    pendente = null;
+    const prova = provasCache.find((p) => p.id === provaId);
+    if (!prova) return;
+    if (!Array.isArray(prova.concluidos)) prova.concluidos = [];
+    if (prova.concluidos.includes(subKey)) return;
+    prova.concluidos.push(subKey);
+    await salvarConcluidos(prova);
+    if (provaAbertaId === provaId && document.querySelector('.main-tab.active')?.dataset.maintab === 'provas') {
+      abrirProva(provaId);
+    }
+  }
+
+  const answerEl = document.querySelector('#answer');
+  if (answerEl) {
+    new MutationObserver(() => {
+      if (pendente?.tipo !== 'e') return;
+      // conteudo valido = resumo preenchido (a tela de erro deixa a lista vazia)
+      if (!answerEl.hidden && document.querySelector('#summary-list')?.children.length > 0) {
+        concluirPendente();
+      }
+    }).observe(answerEl, { attributes: true, attributeFilter: ['hidden'] });
+  }
+
+  const quizSummaryEl = document.querySelector('#quiz-summary');
+  if (quizSummaryEl) {
+    new MutationObserver(() => {
+      if (pendente?.tipo === 't' && !quizSummaryEl.hidden) concluirPendente();
+    }).observe(quizSummaryEl, { attributes: true, attributeFilter: ['hidden'] });
   }
 
   // ---------- sidebar ----------
