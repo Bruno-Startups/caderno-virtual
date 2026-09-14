@@ -1518,3 +1518,41 @@ body.maintab-simulados .hero-subjects { display:none; }
   background: #2f9e6a;
   border-color: #2f9e6a;
 }
+
+/* ===== Modo Prova: barra lateral e aba ===== */
+body.maintab-provas #hero-subjects { display: none; }
+
+.prova-sidebar-item {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  border: 1px solid #e3e9f1;
+  border-left: 3px solid var(--tab-color, var(--blue));
+  border-radius: 10px;
+  background: #fff;
+  margin-bottom: 8px;
+  padding: 0;
+  overflow: hidden;
+  transition: background 0.18s ease;
+}
+.prova-sidebar-item:hover { background: #f6f9fc; }
+.prova-sidebar-ativa {
+  background: #f2f6fb;
+  border-color: var(--tab-color, var(--blue));
+}
+.prova-sidebar-abrir {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 11px 4px 11px 13px;
+  font: inherit;
+  cursor: pointer;
+  color: inherit;
+}
+.prova-sidebar-x {
+  flex-shrink: 0;
+  align-self: center;
+  margin-right: 6px;
+}

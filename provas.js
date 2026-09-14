@@ -240,7 +240,7 @@
       renderLista();
       renderSidebar();
     }));
-    applySubjectColor(ativas[0]?.materia || '');
+    applySubjectColor('');
   }
 
   function renderFormulario() {
@@ -409,7 +409,12 @@
         ${cron.blocos.length ? blocosHtml : '<p class="provas-empty-copy">Essa prova já passou.</p>'}
       </section>`;
 
-    paneProvas.querySelector('#prova-voltar').addEventListener('click', () => { provaAbertaId = null; renderLista(); });
+    renderSidebar();
+    paneProvas.querySelector('#prova-voltar').addEventListener('click', () => {
+      provaAbertaId = null;
+      renderLista();
+      renderSidebar();
+    });
 
     // marcar/desmarcar tudo pelo quadradinho
     paneProvas.querySelectorAll('.prova-check').forEach((btn) => {
@@ -533,14 +538,29 @@
       const palette = corDaMateria(prova.materia);
       const dias = diffDias(hojeLocal(), parseData(prova.data_prova));
       const label = dias < 0 ? 'encerrada' : dias === 0 ? 'hoje' : `${dias}d`;
+      const ativa = prova.id === provaAbertaId ? ' prova-sidebar-ativa' : '';
       return `
-        <button type="button" class="prova-sidebar-item" data-prova="${prova.id}" style="--tab-color:${palette.color}">
-          <span class="prova-sidebar-titulo">${escapeHtml(prova.titulo || 'Prova')}</span>
-          <span class="prova-sidebar-meta">${escapeHtml(prova.materia || '')} · ${label}</span>
-        </button>`;
+        <div class="prova-sidebar-item${ativa}" style="--tab-color:${palette.color}">
+          <button type="button" class="prova-sidebar-abrir" data-prova="${prova.id}">
+            <span class="prova-sidebar-titulo">${escapeHtml(prova.titulo || 'Prova')}</span>
+            <span class="prova-sidebar-meta">${escapeHtml(prova.materia || '')} · ${label}</span>
+          </button>
+          <button type="button" class="icon-button prova-sidebar-x" data-apagar-prova="${prova.id}" aria-label="Apagar prova">×</button>
+        </div>`;
     }).join('');
     historyList.querySelectorAll('[data-prova]').forEach((b) => {
       b.addEventListener('click', () => abrirProva(b.dataset.prova));
+    });
+    historyList.querySelectorAll('[data-apagar-prova]').forEach((b) => {
+      b.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!confirm('Apagar esta prova?')) return;
+        const id = b.dataset.apagarProva;
+        await apagarProva(id);
+        if (provaAbertaId === id) provaAbertaId = null;
+        renderSidebar();
+        if (provaAbertaId) abrirProva(provaAbertaId); else renderLista();
+      });
     });
   }
 
@@ -567,10 +587,26 @@
     renderSidebar();
   }
 
+  // impede que o histórico de estudo/simulados sobrescreva a lista de provas na barra lateral
+  function abaProvasAtiva() {
+    return document.querySelector('.main-tab.active')?.dataset.maintab === 'provas';
+  }
+  ['renderHistory', 'renderQuizSidebarHistory'].forEach((nome) => {
+    const original = window[nome];
+    if (typeof original !== 'function') return;
+    window[nome] = function (...args) {
+      if (abaProvasAtiva()) { renderSidebar(); return; }
+      return original.apply(this, args);
+    };
+  });
+
   // sobrescreve setMainTab pra tratar a aba nova sem editar app.js
   const setMainTabOriginal = window.setMainTab;
   window.setMainTab = function (name) {
-    if (name !== 'provas') return setMainTabOriginal(name);
+    if (name !== 'provas') {
+      document.body.classList.remove('maintab-provas');
+      return setMainTabOriginal(name);
+    }
     document.querySelectorAll('.main-tab').forEach((tab) => {
       const ativa = tab.dataset.maintab === 'provas';
       tab.classList.toggle('active', ativa);
@@ -580,6 +616,7 @@
       pane.classList.toggle('active', pane.dataset.mainpane === 'provas');
     });
     document.body.classList.remove('maintab-simulados');
+    document.body.classList.add('maintab-provas');
     clearHistory.dataset.mode = 'provas';
     entrarNaAba();
   };
