@@ -1617,3 +1617,29 @@ body.maintab-provas #hero-subjects { display: none; }
   transition: background 0.18s ease;
 }
 .prova-lateral-todas:hover { background: rgba(255, 255, 255, 0.09); }
+
+/* botão de remover prova (fundo claro) */
+.prova-card-x {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid #e3e9f1;
+  border-radius: 10px;
+  background: #f6f9fc;
+  color: #8298b4;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+.prova-card-x:hover {
+  background: #fdecec;
+  border-color: #f0c4c4;
+  color: #b6424e;
+}
+.prova-passada .prova-card-x {
+  width: 26px;
+  height: 26px;
+  font-size: 16px;
+}

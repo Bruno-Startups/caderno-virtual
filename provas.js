@@ -202,7 +202,7 @@
           <div class="prova-card-bar"><div style="width:${percent}%"></div></div>
           <div class="prova-card-actions">
             <button type="button" class="primary-button" data-abrir="${prova.id}"><span>Abrir cronograma</span></button>
-            <button type="button" class="icon-button" data-apagar="${prova.id}" aria-label="Apagar prova">×</button>
+            <button type="button" class="prova-card-x" data-apagar="${prova.id}" aria-label="Apagar prova">×</button>
           </div>
         </article>`;
     }).join('');
@@ -213,7 +213,7 @@
         ${passadas.map((p) => `
           <div class="prova-passada">
             <span>${escapeHtml(p.titulo || 'Prova')} · ${dataCurta(p.data_prova)}</span>
-            <button type="button" class="icon-button" data-apagar="${p.id}" aria-label="Apagar prova">×</button>
+            <button type="button" class="prova-card-x" data-apagar="${p.id}" aria-label="Apagar prova">×</button>
           </div>`).join('')}
       </details>` : '';
 
