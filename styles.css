@@ -1683,29 +1683,29 @@ body.maintab-provas #hero-subjects { display: none; }
 /* ===== Intro: capa abrindo + folheado ===== */
 .intro-overlay {
   gap: 14px;
-  animation: intro-fade-out 0.5s ease-in 2.4s forwards;
+  animation: intro-fade-out 0.55s ease-in 3.7s forwards;
 }
-.intro-notebook { width: 168px; height: auto; overflow: visible; }
+.intro-notebook { width: 264px; height: auto; overflow: visible; }
 
 .intro-spiral { animation: intro-espiral 0.4s ease-out 0.1s both; }
 @keyframes intro-espiral { from { opacity: 0; } to { opacity: 1; } }
 
 .intro-cover {
   transform-origin: 30px 124px;
-  animation: intro-abre-capa 0.8s cubic-bezier(0.5, 0, 0.35, 1) 0.35s both;
+  animation: intro-abre-capa 1.05s cubic-bezier(0.45, 0, 0.25, 1) 0.4s both;
 }
 @keyframes intro-abre-capa {
   0%   { transform: scaleX(1); }
-  100% { transform: scaleX(0); }
+  100% { transform: scaleX(-1); }
 }
 
 .intro-page {
   transform-origin: 30px 124px;
   animation: intro-folha 0.5s cubic-bezier(0.55, 0, 0.4, 1) both;
 }
-.intro-page-1 { animation-delay: 1.2s; }
-.intro-page-2 { animation-delay: 1.5s; }
-.intro-page-3 { animation-delay: 1.8s; }
+.intro-page-1 { animation-delay: 1.65s; }
+.intro-page-2 { animation-delay: 1.98s; }
+.intro-page-3 { animation-delay: 2.31s; }
 
 @keyframes intro-folha {
   0%   { transform: scaleX(1); opacity: 1; }
@@ -1751,7 +1751,8 @@ body.maintab-provas #hero-subjects { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .intro-overlay { animation: intro-fade-out 0.3s ease-in 0.4s forwards; }
-  .intro-cover, .intro-page { animation: none; transform: scaleX(0); }
+  .intro-cover { animation: none; transform: scaleX(-1); }
+  .intro-page { animation: none; transform: scaleX(0); }
   .intro-spiral { animation: none; opacity: 1; }
   .intro-caption, .intro-greeting { animation: none; opacity: 1; transform: none; }
 }

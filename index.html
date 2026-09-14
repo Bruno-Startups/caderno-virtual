@@ -14,7 +14,7 @@
   <body>
     <div class="intro-overlay" id="intro-overlay" aria-hidden="true">
       <p class="intro-greeting" id="intro-greeting" hidden></p>
-      <svg class="intro-notebook" viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+      <svg class="intro-notebook" viewBox="-145 0 350 250" xmlns="http://www.w3.org/2000/svg">
         <rect x="30" y="10" width="160" height="228" rx="10" fill="#e9eff7" />
         <g class="intro-final">
           <rect x="30" y="10" width="160" height="228" rx="10" fill="#ffffff" stroke="#e6ecf4" stroke-width="1.5" />
@@ -454,6 +454,18 @@
         alert(r.ok ? "Email de recuperação enviado!" : r.erro);
       }
     </script>
+    <script>
+      (function () {
+        const orig = window.setTimeout;
+        window.setTimeout = function (fn, delay, ...resto) {
+          if (delay === 3000) {
+            window.setTimeout = orig;
+            return orig.call(window, fn, 4300, ...resto);
+          }
+          return orig.call(window, fn, delay, ...resto);
+        };
+      })();
+    </script>
     <script src="app.js"></script>
     <script src="provas.js"></script>
     <script>
@@ -463,7 +475,7 @@
         try {
           const { data: { session } } = await supabaseClient.auth.getSession();
           if (!session?.user?.email) return;
-          el.innerHTML = 'Bons estudos, <span>' + session.user.email + '</span>';
+          el.innerHTML = 'Bons estudos!<span>' + session.user.email + '</span>';
           el.hidden = false;
         } catch {}
       })();
