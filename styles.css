@@ -1657,9 +1657,10 @@ body.maintab-provas #hero-subjects { display: none; }
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: var(--tab-etiqueta, var(--blue));
+  background: var(--tab-etiqueta, #1f66b2);
   transition: background 0.18s ease, box-shadow 0.18s ease;
 }
+.main-tab[data-maintab="estudo"] { --tab-etiqueta: #1f66b2; }
 .main-tab[data-maintab="simulados"] { --tab-etiqueta: #d99206; }
 .main-tab[data-maintab="provas"]    { --tab-etiqueta: #5b3fd6; }
 
