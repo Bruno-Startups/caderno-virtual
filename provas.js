@@ -235,7 +235,6 @@
     paneProvas.querySelectorAll('#provas-nova, #provas-nova-vazio').forEach((b) => b.addEventListener('click', renderFormulario));
     paneProvas.querySelectorAll('[data-abrir]').forEach((b) => b.addEventListener('click', () => abrirProva(b.dataset.abrir)));
     paneProvas.querySelectorAll('[data-apagar]').forEach((b) => b.addEventListener('click', async () => {
-      if (!confirm('Apagar esta prova?')) return;
       await apagarProva(b.dataset.apagar);
       renderLista();
       renderSidebar();
