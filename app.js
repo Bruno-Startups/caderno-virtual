@@ -1284,4 +1284,27 @@ quizRestartButton.addEventListener('click', () => {
   quizState = null;
 });
 
+const quizFromSummaryButton = document.querySelector('#quiz-from-summary');
+
+quizFromSummaryButton.addEventListener('click', () => {
+  if (!currentItem) return;
+  const subject = SUBJECT_COLORS[currentItem.subject] ? currentItem.subject : '';
+  const topic = (currentItem.topic || '').trim();
+
+  quizState = null;
+  quizSummary.hidden = true;
+  quizActive.hidden = true;
+  quizSetupForm.hidden = false;
+
+  quizSelectedSubject = subject;
+  updateQuizSubjectPills();
+  setQuizTopicFieldVisibility(true);
+  renderQuizTopicChips(subject);
+  quizTopicInput.value = topic;
+  if (subject) applySubjectColor(subject);
+
+  setMainTab('simulados');
+  quizSetupForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
 safeRun('quiz-subject-pills', renderQuizSubjectPills);
