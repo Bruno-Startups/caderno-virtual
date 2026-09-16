@@ -89,6 +89,11 @@
               </div>
             </div>
           </div>
+          <div id="progresso-vazio" class="progresso-vazio" hidden>
+            <p class="progresso-vazio-title">Comece a ganhar XP</p>
+            <p class="progresso-vazio-copy">Faça seu primeiro simulado pra subir de nível e acompanhar seu progresso por aqui.</p>
+            <button type="button" class="progresso-vazio-button" data-maintab-trigger="simulados">Fazer um simulado</button>
+          </div>
           <button type="button" class="auth-logout-button" onclick="logout()">Sair</button>
         </div>
 
@@ -348,6 +353,12 @@
                 <span class="xp-levelup-emoji" aria-hidden="true">🎉</span>
                 <span>Level up! Você chegou ao <strong id="xp-levelup-nivel">Nível 2</strong></span>
               </div>
+            </div>
+
+            <div id="xp-result-anon" class="xp-anon" hidden>
+              <p class="xp-anon-title">Crie uma conta pra guardar seu XP</p>
+              <p class="xp-anon-copy">Sem conta, seu progresso não fica salvo. Criar é gratuito e leva menos de um minuto.</p>
+              <button type="button" class="secondary-button" onclick="abrirModalAuth('cadastro')">Criar conta</button>
             </div>
 
             <div class="form-footer">

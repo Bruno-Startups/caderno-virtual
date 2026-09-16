@@ -394,7 +394,14 @@ function renderWikipediaCard(article) {
 function renderMindMap(topic, keywords, color, softColor) {
   const container = document.querySelector('#mindmap-container');
   const nodes = (keywords && keywords.length > 0 ? keywords : []).slice(0, 6);
-  if (nodes.length === 0) { container.innerHTML = ''; return; }
+  if (nodes.length === 0) {
+    container.innerHTML = `
+      <div class="block-empty">
+        <p class="block-empty-title">Sem mapa mental desta vez</p>
+        <p class="block-empty-copy">A IA não destacou palavras-chave suficientes para este assunto. Tente pesquisar um recorte mais específico.</p>
+      </div>`;
+    return;
+  }
 
   const width = 760;
   const height = 400;
@@ -587,6 +594,18 @@ generateExercisesBtn.addEventListener('click', async () => {
     const data = await parseJsonResponse(response);
     if (!response.ok) throw new Error(data.error || 'Não foi possível gerar exercícios agora.');
 
+    if (!Array.isArray(data.exercises) || data.exercises.length === 0) {
+      exercisesList.innerHTML = `
+        <div class="block-empty">
+          <p class="block-empty-title">Nenhum exercício gerado</p>
+          <p class="block-empty-copy">A IA não conseguiu criar exercícios para este assunto. Tente novamente ou pesquise um recorte mais específico.</p>
+          <button type="button" class="secondary-button" id="exercises-retry">Tentar de novo</button>
+        </div>`;
+      exercisesSection.hidden = false;
+      exercisesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
     exercisesList.innerHTML = data.exercises.map((exercise, index) => `
       <div class="exercise-item">
         <p class="exercise-question">${index + 1}. ${bold(exercise.question)}</p>
@@ -606,6 +625,7 @@ generateExercisesBtn.addEventListener('click', async () => {
 });
 
 exercisesList.addEventListener('click', (event) => {
+  if (event.target.closest('#exercises-retry')) { generateExercisesBtn.click(); return; }
   const button = event.target.closest('.exercise-toggle');
   if (!button) return;
   const target = document.querySelector(`#exercise-answer-${button.dataset.index}`);
@@ -712,6 +732,7 @@ function tituloDoNivel(level) {
 }
 
 const progressoCard = document.querySelector('#progresso-card');
+const progressoVazioEl = document.querySelector('#progresso-vazio');
 const progressoNivelNumEl = document.querySelector('#progresso-nivel-num');
 const progressoNivelTituloEl = document.querySelector('#progresso-nivel-titulo');
 const progressoXpAtualEl = document.querySelector('#progresso-xp-atual');
@@ -736,6 +757,7 @@ function animarContagem(el, de, para, duracaoMs = 700) {
 function renderProgressoSidebar(totalXp, { animarDe = null, forcarGlow = false } = {}) {
   if (!progressoCard) return;
   const info = computeLevel(totalXp);
+  if (progressoVazioEl) progressoVazioEl.hidden = true;
   progressoCard.hidden = false;
   progressoNivelNumEl.textContent = `Nível ${info.level}`;
   progressoNivelTituloEl.textContent = tituloDoNivel(info.level);
@@ -778,9 +800,14 @@ function progressoXpAtualNeededSuffix(needed) {
 async function carregarProgresso() {
   if (typeof buscarProgressoNoBanco !== 'function') return;
   const progresso = await buscarProgressoNoBanco();
-  if (!progresso) return;
+  if (!progresso || !(progresso.total_xp > 0)) { mostrarProgressoVazio(); return; }
   ultimoProgresso = progresso;
   renderProgressoSidebar(progresso.total_xp || 0);
+}
+
+function mostrarProgressoVazio() {
+  if (progressoCard) progressoCard.hidden = true;
+  if (progressoVazioEl) progressoVazioEl.hidden = false;
 }
 window.carregarProgresso = carregarProgresso;
 
@@ -811,6 +838,7 @@ if (progressoCard) {
 }
 
 const xpResultEl = document.querySelector('#xp-result');
+const xpAnonEl = document.querySelector('#xp-result-anon');
 const xpResultNivelEl = document.querySelector('#xp-result-nivel');
 const xpGainedTagEl = document.querySelector('#xp-gained-tag');
 const xpResultBarFillEl = document.querySelector('#xp-result-bar-fill');
@@ -822,10 +850,13 @@ function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 
 async function processarXpDoSimulado() {
   if (!xpResultEl) return;
-  if (typeof estaLogado !== 'function' || !estaLogado() || typeof enviarResultadoSimulado !== 'function') {
+  const deslogado = typeof estaLogado !== 'function' || !estaLogado();
+  if (deslogado || typeof enviarResultadoSimulado !== 'function') {
     xpResultEl.hidden = true;
+    if (xpAnonEl) xpAnonEl.hidden = !deslogado;
     return;
   }
+  if (xpAnonEl) xpAnonEl.hidden = true;
 
   try {
     const total = quizState.correct + quizState.wrong;
@@ -1086,6 +1117,7 @@ quizSetupForm.addEventListener('submit', async (event) => {
   quizSummary.hidden = true;
   quizActive.hidden = false;
   if (xpResultEl) { xpResultEl.hidden = true; xpLevelupBanner.hidden = true; }
+  if (xpAnonEl) xpAnonEl.hidden = true;
   await loadQuizQuestion();
 });
 

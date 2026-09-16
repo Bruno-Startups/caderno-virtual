@@ -1757,3 +1757,19 @@ body.maintab-provas #hero-subjects { display: none; }
   .intro-spiral { animation: none; opacity: 1; }
   .intro-caption, .intro-greeting { animation: none; opacity: 1; transform: none; }
 }
+
+/* ---------- estados vazios ---------- */
+.block-empty { display:grid; justify-items:start; gap:var(--sp-8); padding:var(--sp-18) var(--sp-20); border:1px dashed var(--line-strong); border-radius:var(--r-lg); background:var(--white); }
+.block-empty-title { margin:0; color:var(--ink); font-size:14px; font-weight:800; }
+.block-empty-copy { margin:0; color:var(--muted); font-size:13px; line-height:1.55; }
+.block-empty .secondary-button { padding:var(--sp-10) var(--sp-14); font-size:14px; }
+
+.progresso-vazio { margin-top:var(--sp-2); padding:var(--sp-12) var(--sp-14); border:1px solid var(--alpha-warm-25); border-radius:var(--r-md); background:var(--alpha-warm-07); }
+.progresso-vazio-title { margin:0; color:var(--warm-400); font-size:14px; font-weight:800; }
+.progresso-vazio-copy { margin:var(--sp-6) 0 var(--sp-10); color:var(--sky-200); font-size:12px; line-height:1.5; }
+.progresso-vazio-button { width:100%; padding:var(--sp-8); border:0; border-radius:var(--r-sm); background:var(--alpha-warm-25); color:var(--warm-400); font-size:12px; font-weight:800; }
+.progresso-vazio-button:hover { background:var(--alpha-warm-45); }
+
+.xp-anon { margin-top:var(--sp-18); padding:var(--sp-18) var(--sp-20); border:1px dashed var(--line-strong); border-radius:var(--r-xl); background:var(--surface-3); }
+.xp-anon-title { margin:0; color:var(--ink); font-size:15px; font-weight:800; }
+.xp-anon-copy { margin:var(--sp-6) 0 var(--sp-12); color:var(--muted); font-size:13px; line-height:1.55; }
