@@ -247,6 +247,9 @@
   --sp-55: 55px;
   --sp-70: 70px;
 
+  /* Tipografia */
+  --font-display: 'Bricolage Grotesque', Georgia, serif;
+
   /* Aliases legados (app.js sobrescreve --blue e --blue-soft em runtime) */
   --ink: var(--ink-900);
   --blue: var(--brand-500);
