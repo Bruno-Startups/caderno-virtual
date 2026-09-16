@@ -1109,6 +1109,7 @@ quizSetupForm.addEventListener('submit', async (event) => {
     correct: 0,
     wrong: 0,
     weak: {},
+    weakItems: [],
     current: null,
     attemptId: (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`),
   };
@@ -1221,6 +1222,7 @@ function answerQuizQuestion(chosenId) {
     quizState.wrong += 1;
     const key = `${quizState.subject} · ${quizState.currentTopic}`;
     quizState.weak[key] = (quizState.weak[key] || 0) + 1;
+    quizState.weakItems.push({ subject: quizState.subject, topic: quizState.currentTopic });
   }
 
   saveQuizRecord({
@@ -1283,9 +1285,45 @@ quizNextButton.addEventListener('click', async () => {
 
 quizFinishButton.addEventListener('click', finishQuiz);
 
+const quizStudyErrorsButton = document.querySelector('#quiz-study-errors');
+let erroParaEstudar = null;
+
+/* Agrupa os erros do simulado por matéria + tópico e devolve o mais errado.
+   Em caso de empate fica o que apareceu primeiro. */
+function topicoMaisErrado(items) {
+  const contagem = new Map();
+  (items || []).forEach((item) => {
+    if (!item.topic) return;
+    const chave = JSON.stringify([item.subject, item.topic]);
+    const atual = contagem.get(chave) || { subject: item.subject, topic: item.topic, erros: 0 };
+    atual.erros += 1;
+    contagem.set(chave, atual);
+  });
+  let melhor = null;
+  contagem.forEach((valor) => { if (!melhor || valor.erros > melhor.erros) melhor = valor; });
+  return melhor;
+}
+
+quizStudyErrorsButton.addEventListener('click', () => {
+  if (!erroParaEstudar) return;
+  const subject = SUBJECT_COLORS[erroParaEstudar.subject] ? erroParaEstudar.subject : '';
+
+  form.elements.subject.value = subject;
+  topicInput.value = erroParaEstudar.topic;
+  applySubjectColor(subject);
+  updateActivePill();
+  renderTopicChips(subject);
+
+  setMainTab('estudo');
+  form.requestSubmit();
+});
+
 function finishQuiz() {
   quizActive.hidden = true;
   quizSummary.hidden = false;
+
+  erroParaEstudar = topicoMaisErrado(quizState.weakItems);
+  quizStudyErrorsButton.hidden = !erroParaEstudar;
 
   const total = quizState.correct + quizState.wrong;
   const percent = total > 0 ? Math.round((quizState.correct / total) * 100) : 0;
