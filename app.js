@@ -10,6 +10,7 @@ const form = document.querySelector('#study-form');
 const topicInput = document.querySelector('#topic');
 const submitButton = document.querySelector('#submit-button');
 const answer = document.querySelector('#answer');
+const answerTruncated = document.querySelector('#answer-truncated');
 const answerTitle = document.querySelector('#answer-title');
 const answerMeta = document.querySelector('#answer-meta');
 const summaryList = document.querySelector('#summary-list');
@@ -519,6 +520,7 @@ function renderGuiaProva(guide) {
 
 function showAnswer(item, shouldScroll = true) {
   currentItem = item;
+  if (answerTruncated) answerTruncated.hidden = !item.truncated;
   answerTitle.textContent = item.topic;
   answerMeta.textContent = item.schoolYear ? `${item.subject} · ${item.schoolYear}` : item.subject;
   summaryList.innerHTML = item.summary.map((line) => `<li>${bold(line)}</li>`).join('');
@@ -564,7 +566,7 @@ form.addEventListener('submit', async (event) => {
     updateActivePill(wasAutoDetected);
     renderTopicChips(finalSubject);
 
-    const item = { subject: finalSubject, schoolYear, topic: data.topic || topic, summary: data.summary, keywords: data.keywords, examGuide: data.examGuide, explanation: data.explanation, images };
+    const item = { subject: finalSubject, schoolYear, topic: data.topic || topic, summary: data.summary, keywords: data.keywords, examGuide: data.examGuide, explanation: data.explanation, images, truncated: data.truncated === true };
     addToHistory(item);
     showAnswer(item);
   } catch (error) {

@@ -92,7 +92,7 @@ DICA: <uma dica curta que ajuda sem entregar a resposta>`;
     user += `\n\nJá foram usados nesta sessão os seguintes assuntos, dentro da mesma matéria: ${avoidTopics.join(', ')}. Escolha um assunto DIFERENTE desses, ainda dentro da matéria informada, para variar o simulado.`;
   }
   if (Array.isArray(avoidStatements) && avoidStatements.length > 0) {
-    const shortened = avoidStatements.slice(-15).map((text) => text.length > 160 ? `${text.slice(0, 157)}...` : text);
+    const shortened = avoidStatements.slice(-6).map((text) => text.length > 160 ? `${text.slice(0, 157)}...` : text);
     user += `\n\nEstas questões já foram usadas antes para este aluno nesta matéria — NÃO repita nenhuma delas nem crie uma questão muito parecida (mesmo contexto/números), mesmo que o assunto seja o mesmo:\n- ${shortened.join('\n- ')}`;
   }
   if (similarTo) user += `\n\nO aluno errou uma questão parecida com esta anteriormente: "${similarTo}". Crie uma NOVA questão sobre o mesmo assunto e mesma dificuldade, com contexto e números diferentes, para reforçar o mesmo conceito.`;

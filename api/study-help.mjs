@@ -51,10 +51,11 @@ export default async function handler(req, res) {
       }),
     });
     const data = await groqResponse.json();
+    const finishReason = data.choices?.[0]?.finish_reason;
     console.log('[groq] study-help', JSON.stringify({
       prompt_tokens: data.usage?.prompt_tokens,
       completion_tokens: data.usage?.completion_tokens,
-      finish_reason: data.choices?.[0]?.finish_reason,
+      finish_reason: finishReason,
     }));
     if (!groqResponse.ok) throw new Error(data.error?.message || 'Falha ao consultar a IA.');
 
@@ -115,6 +116,7 @@ export default async function handler(req, res) {
       keywords,
       examGuide: { pontos, dica, poucoTempo },
       explanation,
+      truncated: finishReason === 'length',
     });
   } catch (error) {
     return res.status(500).json({ error: error.message || 'Não foi possível gerar o conteúdo.' });
