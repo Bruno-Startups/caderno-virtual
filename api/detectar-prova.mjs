@@ -46,6 +46,12 @@ async function chamarGroq(prompt, tentativa = 0) {
   if (!res.ok) throw new Error(`Groq ${res.status}`);
 
   const data = await res.json();
+  console.log("[groq] detectar-prova", JSON.stringify({
+    prompt_tokens: data?.usage?.prompt_tokens,
+    completion_tokens: data?.usage?.completion_tokens,
+    finish_reason: data?.choices?.[0]?.finish_reason,
+    tentativa,
+  }));
   const texto = data?.choices?.[0]?.message?.content?.trim() || "";
   if (!texto && tentativa < 2) {
     await sleep(800);

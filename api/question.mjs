@@ -169,6 +169,11 @@ async function callGroq(system, user) {
     }),
   });
   const data = await response.json();
+  console.log('[groq] question', JSON.stringify({
+    prompt_tokens: data.usage?.prompt_tokens,
+    completion_tokens: data.usage?.completion_tokens,
+    finish_reason: data.choices?.[0]?.finish_reason,
+  }));
   if (!response.ok) {
     const error = new Error(data.error?.message || 'Falha ao consultar a IA.');
     if (response.status === 429) error.isRateLimit = true;

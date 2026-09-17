@@ -28,6 +28,11 @@ export default async function handler(req, res) {
       }),
     });
     const data = await groqResponse.json();
+    console.log('[groq] exercises', JSON.stringify({
+      prompt_tokens: data.usage?.prompt_tokens,
+      completion_tokens: data.usage?.completion_tokens,
+      finish_reason: data.choices?.[0]?.finish_reason,
+    }));
     if (!groqResponse.ok) throw new Error(data.error?.message || 'Falha ao consultar a IA.');
 
     const raw = data.choices?.[0]?.message?.content?.trim();
