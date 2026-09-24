@@ -1774,3 +1774,15 @@ body.maintab-provas #hero-subjects { display: none; }
 .xp-anon-title { margin:0; color:var(--ink); font-size:15px; font-weight:800; }
 .xp-anon-copy { margin:var(--sp-6) 0 var(--sp-12); color:var(--muted); font-size:13px; line-height:1.55; }
 .answer-truncated { margin-bottom: var(--sp-16); }
+
+/* ---------- sidebar: sem overflow horizontal ---------- */
+html { overflow-x: hidden; }
+.sidebar { overflow-wrap: break-word; }
+.history-list { overflow-x: hidden; }
+.history-tab p { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.quiz-sidebar-card-top > div { min-width: 0; }
+.quiz-sidebar-subject, .quiz-sidebar-meta { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+@media (max-width:800px) {
+  .sidebar { max-width: 100%; }
+}
