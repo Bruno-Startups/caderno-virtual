@@ -35,6 +35,9 @@ export default async function handler(req, res) {
   if (!process.env.GROQ_API_KEY) return res.status(503).json({ error: 'A chave da IA ainda não foi configurada.' });
   try {
     const { subject, schoolYear, topic } = req.body || {};
+    const excedeu = [["subject", subject, 60], ["schoolYear", schoolYear, 60], ["topic", topic, 120]]
+      .find(([, valor, limite]) => typeof valor === "string" && valor.length > limite);
+    if (excedeu) return res.status(400).json({ error: `O campo "${excedeu[0]}" excede o limite de ${excedeu[2]} caracteres.` });
     if (!topic || !topic.trim()) return res.status(400).json({ error: 'Escreva o assunto que você quer estudar.' });
 
     const userPrompt = `Ano escolar informado: ${schoolYear || 'não informado — escolha um nível intermediário, adequado a alunos do 9º ano ao 1º ano do Ensino Médio'}\nMatéria informada: ${subject || 'não informada — identifique você mesmo, pelo assunto'}\nAssunto: ${topic}`;

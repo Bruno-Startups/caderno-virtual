@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Página não encontrada no Caderno Virtual." />
+    <meta name="robots" content="noindex" />
+    <title>Página não encontrada — Caderno Virtual</title>
+    <meta name="theme-color" content="#102642" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .erro-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        padding: 32px 20px;
+        text-align: center;
+      }
+      .erro-mark {
+        width: 68px;
+        height: 68px;
+      }
+      .erro-code {
+        font-family: var(--font-display, 'Bricolage Grotesque', Georgia, serif);
+        font-size: clamp(56px, 14vw, 92px);
+        line-height: 1;
+        margin: 0;
+        color: var(--ink-900, #102642);
+      }
+      .erro-titulo {
+        margin: 0;
+        font-size: clamp(20px, 4vw, 26px);
+        font-weight: 700;
+        color: var(--ink-900, #102642);
+      }
+      .erro-texto {
+        margin: 0;
+        max-width: 42ch;
+        color: var(--ink-500, #4a5a72);
+        line-height: 1.6;
+      }
+      .erro-shell a.primary-button {
+        text-decoration: none;
+      }
+      .erro-rule {
+        width: 96px;
+        height: 8px;
+        border-radius: 4px;
+        background: var(--warm-400, #ffca5c);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="erro-shell">
+      <span class="erro-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" width="68" height="68"><rect x="4" y="2" width="16" height="20" rx="2.5" fill="#12141a"/><rect x="4" y="2" width="5" height="20" fill="#000"/><g stroke="#ffca5c" stroke-width="1.4"><line x1="1.6" y1="6" x2="7.5" y2="6"/><line x1="1.6" y1="10" x2="7.5" y2="10"/><line x1="1.6" y1="14" x2="7.5" y2="14"/><line x1="1.6" y1="18" x2="7.5" y2="18"/></g><rect x="11.5" y="8" width="7" height="2" rx="1" fill="#e7ecf3"/><rect x="11.5" y="12.5" width="5" height="2" rx="1" fill="#e7ecf3"/></svg>
+      </span>
+      <p class="erro-code">404</p>
+      <span class="erro-rule" aria-hidden="true"></span>
+      <h1 class="erro-titulo">Essa página não existe</h1>
+      <p class="erro-texto">O link pode estar errado ou a página pode ter saído do ar. Volte pro início e continue estudando.</p>
+      <a class="primary-button" href="/"><span>Voltar para o início</span><span aria-hidden="true">→</span></a>
+    </main>
+  </body>
+</html>

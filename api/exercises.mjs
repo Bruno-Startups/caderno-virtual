@@ -12,6 +12,9 @@ export default async function handler(req, res) {
   if (!process.env.GROQ_API_KEY) return res.status(503).json({ error: 'A chave da IA ainda não foi configurada.' });
   try {
     const { subject, schoolYear, topic } = req.body || {};
+    const excedeu = [["subject", subject, 60], ["schoolYear", schoolYear, 60], ["topic", topic, 120]]
+      .find(([, valor, limite]) => typeof valor === "string" && valor.length > limite);
+    if (excedeu) return res.status(400).json({ error: `O campo "${excedeu[0]}" excede o limite de ${excedeu[2]} caracteres.` });
     if (!subject || !topic) return res.status(400).json({ error: 'Dados insuficientes para gerar exercícios.' });
 
     const userPrompt = `Ano escolar: ${schoolYear || 'nível intermediário, 9º ano ao 1º ano do Ensino Médio'}\nMatéria: ${subject}\nAssunto: ${topic}`;
