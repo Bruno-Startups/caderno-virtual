@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Caderno Virtual">
+  <rect width="64" height="64" rx="14" fill="#102642" />
+  <rect x="17" y="10" width="34" height="44" rx="5" fill="#12141a" />
+  <rect x="17" y="10" width="11" height="44" rx="5" fill="#000" />
+  <g stroke="#ffca5c" stroke-width="3.4" stroke-linecap="round">
+    <line x1="11" y1="20" x2="26" y2="20" />
+    <line x1="11" y1="30" x2="26" y2="30" />
+    <line x1="11" y1="40" x2="26" y2="40" />
+  </g>
+  <rect x="32" y="22" width="15" height="4.5" rx="2.25" fill="#e7ecf3" />
+  <rect x="32" y="32" width="11" height="4.5" rx="2.25" fill="#e7ecf3" />
+</svg>

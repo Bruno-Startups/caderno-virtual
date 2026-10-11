@@ -69,6 +69,12 @@ export default async function handler(req, res) {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
     const topicos = Array.isArray(body.topicos) ? body.topicos : [];
     const materiaEscolhida = (body.materia || "").trim();
+    if (materiaEscolhida.length > 60) {
+      return res.status(400).json({ erro: "A matéria excede o limite de 60 caracteres." });
+    }
+    if (topicos.join(" ").length > 1500) {
+      return res.status(400).json({ erro: "Os tópicos excedem o limite de 1500 caracteres." });
+    }
 
     const limpos = topicos.map((t) => String(t).trim()).filter(Boolean);
 

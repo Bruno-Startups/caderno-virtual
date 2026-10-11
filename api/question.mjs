@@ -193,6 +193,9 @@ export default async function handler(req, res) {
   if (!process.env.GROQ_API_KEY) return res.status(503).json({ error: 'A chave da IA ainda não foi configurada.' });
   try {
     const { mode, subject, topic, schoolYear, difficulty, institution, similarTo, avoidTopics, avoidStatements } = req.body || {};
+    const excedeu = [["subject", subject, 60], ["schoolYear", schoolYear, 60], ["topic", topic, 120], ["institution", institution, 120]]
+      .find(([, valor, limite]) => typeof valor === "string" && valor.length > limite);
+    if (excedeu) return res.status(400).json({ error: `O campo "${excedeu[0]}" excede o limite de ${excedeu[2]} caracteres.` });
     if (!subject && !topic) return res.status(400).json({ error: 'Escolha uma matéria ou digite um assunto.' });
 
     const { system, user } = buildPrompt({ mode, subject, topic, schoolYear, difficulty, institution, similarTo, avoidTopics, avoidStatements });

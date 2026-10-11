@@ -262,7 +262,7 @@
           <input id="prova-data" type="date" required min="${hojeISO()}" />
 
           <label class="question-label" for="prova-topicos">Tópicos <span aria-hidden="true">*</span></label>
-          <textarea id="prova-topicos" rows="6" required placeholder="Um por linha. Ex.:&#10;Revolução Industrial&#10;Imperialismo&#10;Primeira Guerra Mundial"></textarea>
+          <textarea id="prova-topicos" rows="6" required maxlength="1500" placeholder="Um por linha. Ex.:&#10;Revolução Industrial&#10;Imperialismo&#10;Primeira Guerra Mundial"></textarea>
           <p class="input-hint">Quanto mais específico, melhor o cronograma. A matéria e o título são identificados sozinhos.</p>
 
           <label class="question-label">Matéria (opcional)</label>
